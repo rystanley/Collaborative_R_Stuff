@@ -1,4 +1,4 @@
-## This code is to make a heatmap + cluster dendrogram of greencrab data.  
+## This code is to make a heatmap + cluster dendrogram of greencrab data.  fst works
 
 ### Install package Heatplus
   library(gdata)
