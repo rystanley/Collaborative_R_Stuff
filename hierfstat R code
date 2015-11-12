@@ -1,0 +1,17 @@
+#load library (requires ade4 and gtools)
+library(hierfstat)
+
+#read in an FSTAT file (converted from Structure/Genepop in PGDSpider)
+data1<-read.fstat("FSTATfile.dat")
+
+#Now the basic stats function in hierfstat
+x<-basic.stats(data1)
+
+#Boxplot of Observed Heterozygosity by population
+boxplot(x$Ho)
+
+#Boxplot of Expected heterozygosity by population
+boxplot(x$Hs)
+
+#Final averages for each statistic basic.stats looks at
+x$overall
