@@ -4,5 +4,5 @@ SourceGitFunc <- function(url)
 ## e.g. "https://raw.githubusercontent.com/rystanley/RAD_R_Functions/master/GenoPopConvert.R"
 require(RCurl)
 script <- getURL(url, ssl.verifypeer = FALSE)
-eval(parse(text = script))
+eval(parse(text = script),envir=.GlobalEnv)
 }
