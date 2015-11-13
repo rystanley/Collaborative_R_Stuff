@@ -14,6 +14,8 @@ names(nhdata)[2] <- "Sweeps"
 
 #Melt the data for plotting
 nDat <- melt(nhdata[,],id=c("Pop","Sweeps"))
+
+nDat$Pop=factor(nDat$Pop,levels=c("TKT","BDB","CBI", .. you fill out the rest)
   
 #Plot the data
 p1=ggplot(nDat,aes(x=factor(Sweeps),y=value,fill=variable,group=Pop)) + 
