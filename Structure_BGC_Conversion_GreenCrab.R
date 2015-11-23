@@ -54,6 +54,7 @@ LocusSouth <- unlist(LocusSouth)
 
 LocusMixed <- as.character(CrabMixed_allele$Allele)
 LocusMixed <- lapply(strsplit(LocusMixed, '.', fixed=TRUE), '[[', 1)
+table(unlist(LocusMixed))[which(as.vector(table(unlist(LocusMixed)))==1)] # here we see the issue with locus 3657 5488 6798 7068  946 all only have one allele
 LocusMixed <- LocusMixed[rep(c(TRUE,FALSE),nrow(CrabMixed_allele)/2)]
 LocusMixed <- unlist(LocusMixed)
 
