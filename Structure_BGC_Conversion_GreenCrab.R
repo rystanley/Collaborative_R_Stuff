@@ -20,6 +20,8 @@ CrabNorth <- genind2genpop(CrabNorth)
 CrabSouth <- genind2genpop(CrabSouth)
 CrabMixed <- genind2genpop(CrabMixed) ### I think you have a monomophic allele or something. Not an even number of alleles. 
 
+head(CrabMixed) # should be ab 1 x 230 matrix 
+
 #Grab the allele frequency format data * the code on the web is missing something
 CN_Data=t(CrabNorth@tab)
 CrabNorth_allele <- data.frame(Allele=rownames(CN_Data))
