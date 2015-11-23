@@ -7,7 +7,8 @@
 library(adegenet)
 
 #set working directory (makes for cleaner code) ------------------
-setwd("c:/Users/RyanStanley/OneDrive/PostDoc/DFO/Nick/BGC/")
+# e.g. (setwd("c:/Users/RyanStanley/OneDrive/PostDoc/DFO/Nick/BGC/"))
+setwd("~BGC/")
 
 #Load in geneteic data
 CrabNorth <- import2genind('CrabOutliers_PureNorth.str', onerowperind=F, n.ind=132, n.loc=117, row.marknames=1, col.lab=1, col.pop=2, ask=F)
