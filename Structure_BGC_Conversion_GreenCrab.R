@@ -5,6 +5,7 @@
 
 ##load libraries -------------
         library(adegenet)
+        library(dplyr)
 
 #set working directory (makes for cleaner code) ------------------
 # e.g. (setwd("c:/Users/RyanStanley/OneDrive/PostDoc/DFO/Nick/BGC/"))
