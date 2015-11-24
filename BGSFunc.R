@@ -102,6 +102,13 @@ BGCFunc <- function(p1,p2,admixed,dir="",name=""){
   }
   
 ##load required libraries -------------
+  
+  #Check to make sure the packages required are there
+  packages <- c("dplyr", "adegenet")
+  if (length(setdiff(packages, rownames(installed.packages()))) > 0) {
+    install.packages(setdiff(packages, rownames(installed.packages())))  
+  } 
+  
         require(adegenet)
         require(dplyr)
 
