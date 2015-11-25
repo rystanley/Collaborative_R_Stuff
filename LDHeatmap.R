@@ -33,6 +33,7 @@ colnames(outlier_LD_r2_matrix) <- loci
 
 outlier_LD_r2_matrix <- as.matrix(outlier_LD_r2_matrix)
 
+#colors default is "heat.colors"
 png(filename="LDHeatmap3.png",height=2400,width=2400,res=400,bg="white")
 heatmap.2(outlier_LD_r2_matrix,
           Rowv=FALSE, #rows should be reordered as required
@@ -51,6 +52,7 @@ heatmap.2(outlier_LD_r2_matrix,
           #srtRow = 90,
           key=TRUE,
           keysize = 1,
+          key.title="",
           density.info="none",
           lmat = rbind(c(3,1),c(4,2)), #order of elements (1 is heatmap, 4 is key) #makes the plot a 2x2 grid, each "cell" has 1 element - row tree, key, col tree, and heatmap
           lhei = c(20,5), #row height for plot elements
