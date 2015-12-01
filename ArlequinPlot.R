@@ -22,7 +22,7 @@ aData[outliers,"colour"] <- "red"
       scale_colour_manual(values=c("Black","red"))+scale_size_manual(values=c(1,3))+
       theme_bw()+geom_line(data = ciData,aes(guide=FALSE),lty=2)+
       theme(legend.position="none",panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
-      labs(x="Observed Heterozygosity",y=expression(italic("F")["st"]))
+      labs(x="Observed Heterozygosity",y=expression(italic("F")["ST"]))
     
 
   
