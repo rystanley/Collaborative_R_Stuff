@@ -126,8 +126,8 @@ BGCFunc <- function(p1,p2,admixed,dir="",name=""){
         
          
           #for a given locus get the format for BGC
-          P1_temp <- c(paste("locus ",i,sep=""),paste(P1_alleles[1],P1_alleles[2],sep=" "))
-          P2_temp <- c(paste("locus ",i,sep=""),paste(P2_alleles[1],P2_alleles[2],sep=" "))
+          P1_temp <- c(paste("locus_",i,sep=""),paste(P1_alleles[1],P1_alleles[2],sep=" "))
+          P2_temp <- c(paste("locus_",i,sep=""),paste(P2_alleles[1],P2_alleles[2],sep=" "))
           
           #Combine output sequentially for each locus
           P1_BGC <- c(P1_BGC,P1_temp)
@@ -145,7 +145,7 @@ BGCFunc <- function(p1,p2,admixed,dir="",name=""){
             {
             
             temp1 <- MixedStruct[,c("ID","Pop",col)]
-            Locushold <- paste("locus ",col,sep="") # Start the locus data
+            Locushold <- paste("locus_",col,sep="") # Start the locus data
               
               for (i in unique(MixedStruct$Pop)) # each populatoin
                 {
@@ -164,7 +164,7 @@ BGCFunc <- function(p1,p2,admixed,dir="",name=""){
                 
                 temp5 <- paste(temp4[,"col1"],temp4[,"col2"],sep=" ")
                 
-                Locushold <- c(Locushold,paste("pop ",i,sep=""),temp5)
+                Locushold <- c(Locushold,paste("pop_",i,sep=""),temp5)
                 
               } #end of population loop
             
