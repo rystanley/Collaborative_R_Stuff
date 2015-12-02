@@ -53,7 +53,7 @@
             Output <- NULL
             for (i in 1:nrow(tempData))
             {
-            Output <- c(Output,paste("locus ",tempData[i,"Loci"],sep=""),tempData[i,"Allele"])
+            Output <- c(Output,paste("locus_",tempData[i,"Loci"],sep=""),tempData[i,"Allele"])
             }
             
             return(Output)
@@ -139,7 +139,7 @@
           {
           temp1 <- MixedStruct[,c("ID","Pop",col)]
         
-          Locushold <- paste("locus ",col,sep="") # Start the locus data
+          Locushold <- paste("locus_",col,sep="") # Start the locus data
             
             for (i in unique(MixedStruct$Pop)) # each populatoin
               {
@@ -157,7 +157,7 @@
               
               temp5 <- paste(temp4[,"col1"],temp4[,"col2"],sep=" ")
               
-              Locushold <- c(Locushold,paste("pop ",i,sep=""),temp5)
+              Locushold <- c(Locushold,paste("pop_",i,sep=""),temp5)
             } #end of population loop
           
             MixedData <- c(MixedData,Locushold) # add each successive locus 
