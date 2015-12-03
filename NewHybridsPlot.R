@@ -15,7 +15,10 @@ names(nhdata)[2] <- "Sweeps"
 #Melt the data for plotting
 nDat <- melt(nhdata[,],id=c("Pop","Sweeps"))
 
-nDat$Pop=factor(nDat$Pop,levels=c("TKT","BDB","CBI", .. you fill out the rest)
+#Here you need to fill in the rest (i.e. levels or order you want your plot to be rastered). If not specified ggplot will
+#use alphabetical.
+
+#nDat$Pop=factor(nDat$Pop,levels=c("TKT","BDB","CBI", .. you fill out the rest)
   
 #Plot the data
 p1=ggplot(nDat,aes(x=factor(Sweeps),y=value,fill=variable,group=Pop)) + 
@@ -29,7 +32,7 @@ p1=ggplot(nDat,aes(x=factor(Sweeps),y=value,fill=variable,group=Pop)) +
     labs(x="Population",y="",fill="");p1
 
 #Save plot  
-ggsave("c:/Users/test/OneDrive/PostDoc/DFO/Nick/New Hybrids/NewHybrids_Output.png",
+ggsave("NewHybrids_Output.png",
        width=8.5,height=7.5,p1)
   
 
