@@ -1,6 +1,6 @@
 AlleleFreqHeatMap <- function(GenePop,subs=NULL,keep=TRUE,POP="CHAR",refPop,OrderPops=NULL,standardize=TRUE,optimizer=TRUE,plot=TRUE){
   
-  #Function details -------------
+  #Function details ---------------
   
   #This function will convert a GenePop file into a tabular format for the calculation of 
   #allele frequencies of any outliers
