@@ -22,6 +22,17 @@ SourceGitFunc <- function(url)
   eval(parse(text = script),envir=.GlobalEnv)
 }
 
+#function for recoding
+recoderFunc <- function(data, oldvalue, newvalue) 
+  {
+    if (is.factor(data))     data     <- as.character(data)
+      if (is.factor(oldvalue)) oldvalue <- as.character(oldvalue)
+      if (is.factor(newvalue)) newvalue <- as.character(newvalue)
+      newvec <- data
+      for (i in unique(oldvalue)) newvec[data == i] <- newvalue[oldvalue == i]
+      newvec
+  }
+
 #Source the function which will create the plot
 SourceGitFunc("https://raw.githubusercontent.com/rystanley/RAD_R_Functions/master/AlleleFreq.R")
 
