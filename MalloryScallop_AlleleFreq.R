@@ -22,17 +22,6 @@ SourceGitFunc <- function(url)
   eval(parse(text = script),envir=.GlobalEnv)
 }
 
-#function for recoding
-recoderFunc <- function(data, oldvalue, newvalue) 
-  {
-    if (is.factor(data))     data     <- as.character(data)
-      if (is.factor(oldvalue)) oldvalue <- as.character(oldvalue)
-      if (is.factor(newvalue)) newvalue <- as.character(newvalue)
-      newvec <- data
-      for (i in unique(oldvalue)) newvec[data == i] <- newvalue[oldvalue == i]
-      newvec
-  }
-
 #Source the function which will create the plot
 SourceGitFunc("https://raw.githubusercontent.com/rystanley/RAD_R_Functions/master/AlleleFreq.R")
 
@@ -52,13 +41,13 @@ GenePopData <- read.table("GenePopFixed.txt",
                           header = FALSE, sep = "\t", quote = "", stringsAsFactors = FALSE)
 
 
-Outliers <- read.table("Cline_Outlier_Loci.csv",
-                       header = TRUE, sep = "\t")
+Outliers <- read.csv("Cline_Outlier_Loci.csv",
+                       header = TRUE)
 
 Outliers <- as.character(Outliers$Outlier)
 
 Neutral <- read.table("Cline_Neutral_Loci.csv",
-                      header=TRUE, sep="\t")
+                      header=TRUE)
 
 Neutral  <- as.character(Neutral$Neutral)
 
@@ -86,8 +75,11 @@ PopOrder <- rev(c("bon","ltb","mgd","nts","psb","bof","ssm","gmi","ssb","gmo","g
     
     #Create the plot
     p1 <- ggplot(Scallop_Heat_Outlier,aes(x=SNP,y=Pop,fill=FreqStand))+
-      geom_tile()+ scale_y_discrete(expand = c(0,0))+scale_x_discrete(expand = c(0,0))+
-      theme_bw()+theme(legend.position="bottom",axis.text.x = element_text(angle = 45, hjust = 1))+
+      geom_tile()+ 
+      scale_y_discrete(expand = c(0,0))+
+      scale_x_discrete(expand = c(0,0))+
+      theme_bw()+
+      theme(legend.position="bottom",axis.text.x = element_text(angle = 45, hjust = 1))+
       scale_fill_gradient(low="blue",high=muted("red"))+
       labs(y="Population",x="SNP",fill="Standardized allele frequency")
     
