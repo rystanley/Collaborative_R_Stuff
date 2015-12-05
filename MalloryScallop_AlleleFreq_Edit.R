@@ -35,6 +35,10 @@ recoderFunc <- function(data, oldvalue, newvalue) {
   for (i in unique(oldvalue)) newvec[data == i] <- newvalue[oldvalue == i]
   newvec
 }
+
+#setwd
+setwd("~/School/MASTER_Masters/Genetic_Data/June_2014_finals/Clines/Scallop_Cline_HM/AlleleFrequency")
+
 # Load data ------------------
 
 GenePopData <- read.table("GenePopFixed.txt",
@@ -44,20 +48,20 @@ GenePopData <- read.table("GenePopFixed.txt",
 Outliers <- read.csv("Cline_Outlier_Loci.csv",
                        header = TRUE)
 
-<<<<<<< HEAD
-Outliers <- as.character(Outliers$Outlier)
-=======
+#<<<<<<< HEAD
+#Outliers <- as.character(Outliers$Outlier)
+#=======
 Outliers <- as.character(Outliers$Locus)
->>>>>>> 390d3ea840c4303a154a6c5c5cf98395d0775389
+#>>>>>>> 390d3ea840c4303a154a6c5c5cf98395d0775389
 
 Neutral <- read.csv("Cline_Neutral_Loci.csv",
                       header=TRUE)
 
-<<<<<<< HEAD
-Neutral  <- as.character(Neutral$Neutral)
-=======
+#<<<<<<< HEAD
+#Neutral  <- as.character(Neutral$Neutral)
+#=======
 Neutral  <- as.character(Neutral$Locus)
->>>>>>> 390d3ea840c4303a154a6c5c5cf98395d0775389
+#>>>>>>> 390d3ea840c4303a154a6c5c5cf98395d0775389
 
 
 ## Read in the population name updates ---------------
@@ -80,12 +84,12 @@ PopOrder <- rev(c("bon","ltb","mgd","nts","psb","bof","ssm","gmi","ssb","gmo","g
       {
       Scallop_Heat_Outlier[,"Pop"] <- recoderFunc(Scallop_Heat_Outlier[,"Pop"],NameUpdates[i,"old"],NameUpdates[i,"new"])
     }
-<<<<<<< HEAD
-=======
+#<<<<<<< HEAD
+#=======
 
     #Fix the label orders
     Scallop_Heat_Outlier$Pop=factor(Scallop_Heat_Outlier$Pop,levels=rev(NameUpdates[,"new"]))
->>>>>>> 390d3ea840c4303a154a6c5c5cf98395d0775389
+#>>>>>>> 390d3ea840c4303a154a6c5c5cf98395d0775389
     
     #Create the plot
     p1 <- ggplot(Scallop_Heat_Outlier,aes(x=SNP,y=Pop,fill=FreqStand))+
@@ -117,12 +121,12 @@ for (i in 1:nrow(NameUpdates))
   Scallop_Heat_Neutral[,"Pop"] <- recoderFunc(Scallop_Heat_Neutral[,"Pop"],NameUpdates[i,"old"],NameUpdates[i,"new"])
 }
 
-<<<<<<< HEAD
-=======
+#<<<<<<< HEAD
+#=======
 #Fix the label orders
 Scallop_Heat_Neutral$Pop=factor(Scallop_Heat_Neutral$Pop,levels=rev(NameUpdates[,"new"]))
 
->>>>>>> 390d3ea840c4303a154a6c5c5cf98395d0775389
+#>>>>>>> 390d3ea840c4303a154a6c5c5cf98395d0775389
 #Create the plot
 p2 <- ggplot(Scallop_Heat_Neutral,aes(x=SNP,y=Pop,fill=FreqStand))+
   geom_tile()+ scale_y_discrete(expand = c(0,0))+scale_x_discrete(expand = c(0,0))+
@@ -152,12 +156,12 @@ for (i in 1:nrow(NameUpdates))
   Scallop_Heat_NeutralCline[,"Pop"] <- recoderFunc(Scallop_Heat_NeutralCline[,"Pop"],NameUpdates[i,"old"],NameUpdates[i,"new"])
 }
 
-<<<<<<< HEAD
-=======
+#<<<<<<< HEAD
+#=======
 #Fix the label orders
 Scallop_Heat_NeutralCline$Pop=factor(Scallop_Heat_NeutralCline$Pop,levels=rev(NameUpdates[,"new"]))
 
->>>>>>> 390d3ea840c4303a154a6c5c5cf98395d0775389
+#>>>>>>> 390d3ea840c4303a154a6c5c5cf98395d0775389
 #Create the plot
 p3 <- ggplot(Scallop_Heat_NeutralCline,aes(x=SNP,y=Pop,fill=FreqStand))+
   geom_tile()+ scale_y_discrete(expand = c(0,0))+scale_x_discrete(expand = c(0,0))+
