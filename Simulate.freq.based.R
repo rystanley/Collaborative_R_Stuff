@@ -6,7 +6,10 @@ out.name <- "West_IB_10_F_20_SIM_No"
 pop.groups <- c("FRM", "WLD")
 sample.size <- 20
 
-
+#load the libraries 
+require(dplyr)
+require(tidyr)
+require(stringr)
 
 
  ## Stacks version information
@@ -40,8 +43,8 @@ sample.size <- 20
    
 ## Going to have to break the two alleles of the SNPS apart - this will thus double the number of columns
     ## SO <- will want to have SNP_A and SNP_A2 
-ColumnData2 <- ColumnData ## Duplicatet the SNP names
-ColumnData2 <- paste(ColumnData2, "2", sep = ".")    ## add .2 to each duplicated name
+    ColumnData2 <- ColumnData ## Duplicatet the SNP names
+    ColumnData2 <- paste(ColumnData2, "2", sep = ".")    ## add .2 to each duplicated name
      
 ## can't just append the duplicated names to the end of the original names - have to intersperse them
 places = rep(1:length(ColumnData)*2) ### creates a list of even numbers 2X as long as the number of columns
@@ -143,28 +146,30 @@ for(i in 1:length(pop.recall)){
 
 ### MAKE PURE CROSS
 pure.name.recall <- NULL
-for(k in 1:length(pop.groups)){
+for(k in 1:length(pop.groups))
+  {
+    
+    pop1 <- get(mat.name.recall[k])
+    pop2 <- get(mat.name.recall[k])
+    off.interspersed.out <- NULL
+      for(i in 1:sample.size)
+        {
+        
+            hold.off.pop1 <- apply(pop1, FUN = sample, 2, 1)
+            hold.off.pop2 <- apply(pop2, FUN = sample, 2, 1)
+            hold.off.interspersed <- data.frame(c(rbind(hold.off.pop1, hold.off.pop2)))
+            
+            off.interspersed.out <- rbind(off.interspersed.out, t(hold.off.interspersed))
+        
+        
+        }
+    
+    pure.name <- paste("Pure", pop.groups[k], sep = "_")
+    pure.name.recall <- c(pure.name.recall, pure.name)
+    
+    assign(x = pure.name, value = off.interspersed.out, envir = globalenv())
 
-pop1 <- get(mat.name.recall[k])
-pop2 <- get(mat.name.recall[k])
-off.interspersed.out <- NULL
-for(i in 1:sample.size){
-
-hold.off.pop1 <- apply(pop1, FUN = sample, 2, 1)
-hold.off.pop2 <- apply(pop2, FUN = sample, 2, 1)
-hold.off.interspersed <- data.frame(c(rbind(hold.off.pop1, hold.off.pop2)))
-
-off.interspersed.out <- rbind(off.interspersed.out, t(hold.off.interspersed))
-
-
-}
-
-pure.name <- paste("Pure", pop.groups[k], sep = "_")
-pure.name.recall <- c(pure.name.recall, pure.name)
-
-assign(x = pure.name, value = off.interspersed.out, envir = globalenv())
-
-}
+  }
 
 #}
 
@@ -190,8 +195,6 @@ for(i in 1:length(pop.recall)){
       inv.pure.name.recall <- c(mat.name.recall, mat.out.name)
       
 }
-
-
 
 
 ### MAKE F1 CROSS
@@ -275,7 +278,7 @@ for(i in 1:length(pure.name.recall)){
   off.name <- paste(pure.name.recall[i], c(1:sample.size), sep="_")
   hold.dat <- get(pure.name.recall[i])
   hold.dat <- data.frame(off.name, hold.dat)
-  assign(x = pure.name.recall[i], value = hold.dat, envir = globalenv())
+  assign(x = pure.name.recall[i], value = hold.dat, envir = globalenv()) ## note sure if this needs to be to the global enviornment it this is wrapped in a function anyway
 }
 
 
@@ -290,7 +293,7 @@ for(i in 1:length(BC.name.recall)){
   off.name <- paste(BC.name.recall[i], c(1:sample.size), sep="_")
   hold.dat <- get(BC.name.recall[i])
   hold.dat <- data.frame(off.name, hold.dat)
-  assign(x = BC.name.recall[i], value = hold.dat, envir = globalenv())
+  assign(x = BC.name.recall[i], value = hold.dat, envir = globalenv()) ## note sure if this needs to be to the global enviornment it this is wrapped in a function anyway
 }
 
 
