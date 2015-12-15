@@ -459,16 +459,33 @@ for(i in 1:length(pop.names)){
   sim.out <- rbind(sim.out, hold.pop)
 }
 
-Loci.sim <- do.call(paste, c(data.frame(sim.out[,]), sep = " "))
+df <- as.data.frame(sim.out[,])
+PopNames <- as.character(df$ID)
+sim.out <- df[,2:length(df)]
+LociNames <- colnames(sim.out)
+spacer <- rep(" ,  ",length(PopNames))
 
+Loci.sim <- do.call(paste, c(sim.out[,], sep = " "))
+
+out.df <- as.data.frame(cbind(PopNames,spacer,Loci.sim))
+
+df <- do.call(paste,c(out.df[,],sep=""))
 
 PopLengths <- rep(sample.size, length=length(pop.names))
 PopPosition <- NULL
-    PopPosition <- c(PopLengths[1]+1,rep(NA,length(pop.names)-1))
-      for (i in 2:length(PopPosition)){
-          PopPosition[i] <- PopLengths+PopPosition[i-1]
+    PopPosition <- c(PopLengths[1]+1,rep(NA,length(pop.names)-2))
+      for (i in 2:(length(PopPosition))){
+          PopPosition[i] <- PopLengths[i]+PopPosition[i-1]
       }
 
 
-
+    #Insert the value of "Pop" which partitions the data among populations #only if more than one population
+    Loci <- insert.vals(Vec=df,breaks=PopPosition,newVal="Pop")
+    
+    #Add the stacks version label, loci names, first pop iD and the Loci data
+    Loci.out <- c(stacks.version,LociNames,"Pop",Loci) 
+    
+    # Save the file
+    write.table(Loci.out,"testing123.txt",col.names=FALSE,row.names=FALSE,quote=FALSE)
+    
 
