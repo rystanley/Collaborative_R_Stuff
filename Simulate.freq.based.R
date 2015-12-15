@@ -1,3 +1,7 @@
+require(stringr)
+require(plyr)
+require(tidyr)
+
 rm(list = ls())
 
 GenePopData <- read.table("BDN.IB.to.SIM.txt", header = FALSE, sep = "\t", quote = "", stringsAsFactors = FALSE)
@@ -440,10 +444,31 @@ for(b in 1:length(BC.name.recall)){
     
 
   
-pop.names <- c(pure.name.recall, "F1", "F2", BC.name.recall)  
-  ## this is the populations to add
-### each is length = sample.size
+pop.names <- c(pure.name.recall, "F1.out", "F2.out", BC.name.recall)  
+
+for(i in 1:length(pop.names)){
+  temp.hold <- get(pop.names[i])
+  temp.hold[,1] <- paste(pop.names[i], c(1:nrow(temp.hold)), sep = "_")
+  assign(x = pop.names[i], value = temp.hold, envir = globalenv())
   
+}
+
+sim.out <- NULL
+for(i in 1:length(pop.names)){
+  hold.pop <- get(pop.names[i])
+  sim.out <- rbind(sim.out, hold.pop)
+}
+
+Loci.sim <- do.call(paste, c(data.frame(sim.out[,]), sep = " "))
+
+
+PopLengths <- rep(sample.size, length=length(pop.names))
+PopPosition <- NULL
+    PopPosition <- c(PopLengths[1]+1,rep(NA,length(pop.names)-1))
+      for (i in 2:length(PopPosition)){
+          PopPosition[i] <- PopLengths+PopPosition[i-1]
+      }
+
 
 
 
