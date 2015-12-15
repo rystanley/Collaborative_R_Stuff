@@ -276,7 +276,7 @@ for(i in 1:length(pure.name.recall)){
   hold.dat <- get(pure.name.recall[i])
   hold.dat <- data.frame(off.name, hold.dat)
   ColumnData.Dup.insert = c("ID", ColumnData.Dup)
-  colnames(hold.dat) = ColumnData.Dup
+  colnames(hold.dat) = ColumnData.Dup.insert
   assign(x = pure.name.recall[i], value = hold.dat, envir = globalenv())
 }
 
@@ -295,13 +295,14 @@ for(i in 1:length(BC.name.recall)){
   hold.dat <- get(BC.name.recall[i])
   hold.dat <- data.frame(off.name, hold.dat)
   ColumnData.Dup.insert = c("ID", ColumnData.Dup)
-  colnames(hold.dat) = ColumnData.Dup
+  colnames(hold.dat) = ColumnData.Dup.insert
   assign(x = BC.name.recall[i], value = hold.dat, envir = globalenv())
 }
 
 
 pure.name.recall
 BC.name.recall
+b=1
 for(b in 1:length(pure.name.recall)){
   
   fam.to.bind.name <- pure.name.recall[b]
@@ -390,6 +391,7 @@ for(b in 1:length(pure.name.recall)){
   fam.to.remove.untyped[which(str_detect(string = fam.to.remove.untyped, pattern = "000")==TRUE)] = "000000"
   assign(x = fam.to.remove.untyped.name, value = fam.to.remove.untyped, envir = globalenv())
 
+  b=1
 for(b in 1:length(BC.name.recall)){
   
   fam.to.bind.name <- BC.name.recall[b]
