@@ -483,4 +483,4 @@ Loci <- insert.vals(Vec=df2,breaks=PopPosition,newVal="Pop")
 Loci.out <- c(stacks.version,LociNames,"Pop",Loci)
   
 #save the output as text file. 
-write.table(Loci.out,"testing123.txt",col.names=FALSE,row.names=FALSE,quote=FALSE)
+write.table(Loci.out,paste0(out.name,".txt"),col.names=FALSE,row.names=FALSE,quote=FALSE)
