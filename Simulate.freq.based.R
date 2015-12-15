@@ -462,13 +462,18 @@ for(i in 1:length(pop.names)){
 Loci.sim <- do.call(paste, c(data.frame(sim.out[,]), sep = " "))
 
 
-PopLengths <- rep(sample.size, length=length(pop.names))
+PopLengths <- sample.size
 PopPosition <- NULL
     PopPosition <- c(PopLengths[1]+1,rep(NA,length(pop.names)-1))
       for (i in 2:length(PopPosition)){
           PopPosition[i] <- PopLengths+PopPosition[i-1]
       }
+PopPosition <- PopPosition[-length(PopPosition)]
+
+Loci.out <- insert.vals(Vec = Loci.sim, breaks = PopPosition, newVal = "Pop")
+Loci.out <- c("Pop", Loci.out)
+
+Loci.out <- c(stacks.version, ColumnData, Loci.out)
 
 
-
-
+write.table(x = Loci.out, file = paste0(out.name, ".txt"), row.names = FALSE, col.names = FALSE)
