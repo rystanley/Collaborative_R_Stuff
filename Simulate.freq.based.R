@@ -275,28 +275,53 @@ for(i in 1:length(pure.name.recall)){
   off.name <- paste(pure.name.recall[i], c(1:sample.size), sep="_")
   hold.dat <- get(pure.name.recall[i])
   hold.dat <- data.frame(off.name, hold.dat)
+  ColumnData.Dup.insert = c("ID", ColumnData.Dup)
+  colnames(hold.dat) = ColumnData.Dup
   assign(x = pure.name.recall[i], value = hold.dat, envir = globalenv())
 }
 
 
 f1.off.name <- paste("F1", c(1:sample.size), sep = "_")
 F1.out <- data.frame(f1.off.name, F1.out)
+colnames(F1.out) <- c("ID", ColumnData.Dup)
 
 f2.off.name <- paste("F2", c(1:sample.size), sep = "_")
 F2.out <-  data.frame(f2.off.name, F2.out)
+colnames(F2.out) <- c("ID", ColumnData.Dup)
 
 BC.name.recall
 for(i in 1:length(BC.name.recall)){
   off.name <- paste(BC.name.recall[i], c(1:sample.size), sep="_")
   hold.dat <- get(BC.name.recall[i])
   hold.dat <- data.frame(off.name, hold.dat)
+  ColumnData.Dup.insert = c("ID", ColumnData.Dup)
+  colnames(hold.dat) = ColumnData.Dup
   assign(x = BC.name.recall[i], value = hold.dat, envir = globalenv())
 }
 
 
+pure.name.recall
+BC.name.recall
+for(b in 1:length(pure.name.recall)){
+  
+  fam.to.bind.name <- pure.name.recall[b]
+  fam.to.bind <- get(fam.to.bind.name)
+  indiv.hold <- fam.to.bind[,1]
+  loci.bind <- which(str_detect(string = colnames(fam.to.bind), pattern = "\\.2")==TRUE)
+    col.out <- NULL
+    
+    for(s in 1:length(loci.bind)){
+      place.1 <- (loci.bind[s]-1)
+      place.2 <- loci.bind[s]
+      hold.col <- paste0(fam.to.bind[,place.1], fam.to.bind[,place.2])
+      col.out <- cbind(col.out, hold.col)
 
-
-
+        }
+  
+  fam.reord <- cbind(indiv.hold,col.out)
+  colnames(fam.reord) <- c(colnames(fam.to.bind[1]), colnames(fam.to.bind[c((loci.bind-1))]))
+  assign(x = fam.to.bind.name, fam.reord, envir = globalenv())
+  
 
 for(b in 1:length(pure.name.recall)){
   
@@ -306,19 +331,87 @@ for(b in 1:length(pure.name.recall)){
   fam.to.remove.untyped[which(str_detect(string = fam.to.remove.untyped, pattern = "000")==TRUE)] = "000000"
   assign(x = fam.to.remove.untyped.name, value = fam.to.remove.untyped, envir = globalenv())
 }
+  
+    }
 
+## F1
+  
+  fam.to.bind.name <- "F1.out"
+  
+  fam.to.bind <- get(fam.to.bind.name)
+  indiv.hold <- fam.to.bind[,1]
+  loci.bind <- which(str_detect(string = colnames(fam.to.bind), pattern = "\\.2")==TRUE)
+    col.out <- NULL
+    
+    for(s in 1:length(loci.bind)){
+      place.1 <- (loci.bind[s]-1)
+      place.2 <- loci.bind[s]
+      hold.col <- paste0(fam.to.bind[,place.1], fam.to.bind[,place.2])
+      col.out <- cbind(col.out, hold.col)
 
-fam.to.remove.untyped.name <- "F1.out"
+        }
+  
+  fam.reord <- cbind(indiv.hold,col.out)
+  colnames(fam.reord) <- c(colnames(fam.to.bind[1]), colnames(fam.to.bind[c((loci.bind-1))]))
+  assign(x = fam.to.bind.name, fam.reord, envir = globalenv())
+
+  
+  fam.to.remove.untyped.name <- "F1.out"
   
   fam.to.remove.untyped <- get(fam.to.remove.untyped.name)
   fam.to.remove.untyped[which(str_detect(string = fam.to.remove.untyped, pattern = "000")==TRUE)] = "000000"
   assign(x = fam.to.remove.untyped.name, value = fam.to.remove.untyped, envir = globalenv())
+
+
   
-fam.to.remove.untyped.name <- "F2.out"
+  fam.to.bind.name <- "F2.out"
+  
+  fam.to.bind <- get(fam.to.bind.name)
+  indiv.hold <- fam.to.bind[,1]
+  loci.bind <- which(str_detect(string = colnames(fam.to.bind), pattern = "\\.2")==TRUE)
+    col.out <- NULL
+    
+    for(s in 1:length(loci.bind)){
+      place.1 <- (loci.bind[s]-1)
+      place.2 <- loci.bind[s]
+      hold.col <- paste0(fam.to.bind[,place.1], fam.to.bind[,place.2])
+      col.out <- cbind(col.out, hold.col)
+
+        }
+  
+  fam.reord <- cbind(indiv.hold,col.out)
+  colnames(fam.reord) <- c(colnames(fam.to.bind[1]), colnames(fam.to.bind[c((loci.bind-1))]))
+  assign(x = fam.to.bind.name, fam.reord, envir = globalenv())
+
+  
+  fam.to.remove.untyped.name <- "F2.out"
   
   fam.to.remove.untyped <- get(fam.to.remove.untyped.name)
   fam.to.remove.untyped[which(str_detect(string = fam.to.remove.untyped, pattern = "000")==TRUE)] = "000000"
   assign(x = fam.to.remove.untyped.name, value = fam.to.remove.untyped, envir = globalenv())
+
+for(b in 1:length(BC.name.recall)){
+  
+  fam.to.bind.name <- BC.name.recall[b]
+  
+  fam.to.bind <- get(fam.to.bind.name)
+  indiv.hold <- fam.to.bind[,1]
+  loci.bind <- which(str_detect(string = colnames(fam.to.bind), pattern = "\\.2")==TRUE)
+    col.out <- NULL
+    
+    for(s in 1:length(loci.bind)){
+      place.1 <- (loci.bind[s]-1)
+      place.2 <- loci.bind[s]
+      hold.col <- paste0(fam.to.bind[,place.1], fam.to.bind[,place.2])
+      col.out <- cbind(col.out, hold.col)
+
+        }
+  
+  fam.reord <- cbind(indiv.hold,col.out)
+  colnames(fam.reord) <- c(colnames(fam.to.bind[1]), colnames(fam.to.bind[c((loci.bind-1))]))
+  assign(x = fam.to.bind.name, fam.reord, envir = globalenv())
+  
+}
 
 for(b in 1:length(BC.name.recall)){
   
@@ -328,7 +421,6 @@ for(b in 1:length(BC.name.recall)){
   fam.to.remove.untyped[which(str_detect(string = fam.to.remove.untyped, pattern = "000")==TRUE)] = "000000"
   assign(x = fam.to.remove.untyped.name, value = fam.to.remove.untyped, envir = globalenv())
 }
-
 
 #Now recompile the GenePop format
 
@@ -343,6 +435,8 @@ for(b in 1:length(BC.name.recall)){
     x <- x[-(breaks)] #Finding the rows of the new dataframe that will receive old rows
     for(i in 1:length(Vec)){newvec[x[i]]=Vec[i]} 
     return(newvec)}
+    
+
   
 pop.names <- c(pure.name.recall, "F1", "F2", BC.name.recall)  
   ## this is the populations to add
