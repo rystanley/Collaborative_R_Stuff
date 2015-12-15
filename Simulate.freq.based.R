@@ -459,33 +459,30 @@ for(i in 1:length(pop.names)){
   sim.out <- rbind(sim.out, hold.pop)
 }
 
-df <- as.data.frame(sim.out[,])
-PopNames <- as.character(df$ID)
-sim.out <- df[,2:length(df)]
-LociNames <- colnames(sim.out)
-spacer <- rep(" ,  ",length(PopNames))
+df <- as.data.frame(sim.out[,]) #conver the data to a dataframe 
+PopNames <- as.character(df$ID) #remove the populaton ID data
+sim.out2 <- df[,2:length(df)] #create second vector which is just the loci data
+LociNames <- colnames(sim.out2) #grab the loci names
+spacer <- rep(" ,  ",length(PopNames)) # create a spacer vector (this could aslo just use paste but this is easier for bug checking)
+Loci.sim <- do.call(paste, c(sim.out2[,], sep = " ")) #paste all the loci together with a " " as a sperator
+out.df <- as.data.frame(cbind(PopNames,spacer,Loci.sim)) #bind the names, predefined spacer array and single loci strings togther
+df2 <- do.call(paste,c(out.df[,],sep="")) #paste all the columsn into a vector of length(pop.names)*sample.size long
 
-Loci.sim <- do.call(paste, c(sim.out[,], sep = " "))
-
-out.df <- as.data.frame(cbind(PopNames,spacer,Loci.sim))
-
-df <- do.call(paste,c(out.df[,],sep=""))
-
+# find the positions by which "Pop" should be added in
 PopLengths <- rep(sample.size, length=length(pop.names))
 PopPosition <- NULL
-    PopPosition <- c(PopLengths[1]+1,rep(NA,length(pop.names)-2))
-      for (i in 2:(length(PopPosition))){
-          PopPosition[i] <- PopLengths[i]+PopPosition[i-1]
-      }
+PopPosition <- c(PopLengths[1]+1,rep(NA,length(pop.names)-2))
+for (i in 2:(length(PopPosition))){
+  PopPosition[i] <- PopLengths[i]+PopPosition[i-1]
+}
 
+#Insert the value of "Pop" which partitions the data among populations #only if more than one population
+Loci <- insert.vals(Vec=df2,breaks=PopPosition,newVal="Pop")
 
-    #Insert the value of "Pop" which partitions the data among populations #only if more than one population
-    Loci <- insert.vals(Vec=df,breaks=PopPosition,newVal="Pop")
-    
-    #Add the stacks version label, loci names, first pop iD and the Loci data
-    Loci.out <- c(stacks.version,LociNames,"Pop",Loci) 
-    
-    # Save the file
-    write.table(Loci.out,"testing123.txt",col.names=FALSE,row.names=FALSE,quote=FALSE)
+#combine all stacks version, loci labels, first pop entry, and loci data together in one long vector
+Loci.out <- c(stacks.version,LociNames,"Pop",Loci)
+
+#save the output as text file. 
+write.table(Loci.out,"testing123.txt",col.names=FALSE,row.names=FALSE,quote=FALSE)
     
 
