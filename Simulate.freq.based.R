@@ -2,13 +2,13 @@ require(stringr)
 require(plyr)
 require(tidyr)
 
-rm(list = ls())
+rm(list = ls() )
 
-GenePopData <- read.table("BDN.IB.to.SIM.txt", header = FALSE, sep = "\t", quote = "", stringsAsFactors = FALSE)
+GenePopData <- read.table("GRR.IB.to.SIM.txt", header = FALSE, sep = "\t", quote = "", stringsAsFactors = FALSE)
 GenePop <- GenePopData
-out.name <- "West_IB_10_F_20_SIM_No"
+out.name <- "GRR_FreqSim_N502"
 pop.groups <- c("FRM", "WLD")
-sample.size <- 20
+sample.size <- 50
 
 
 
@@ -121,7 +121,8 @@ pop.recall <- NULL
       pop.recall <- c(pop.recall, popn)
       
     }
-
+i = 2
+k=1
 mat.name.recall <- NULL
 for(i in 1:length(pop.recall)){
     temp.mat <- data.frame(matrix(vector(), 2, length(temp2)/2))
@@ -132,9 +133,10 @@ for(i in 1:length(pop.recall)){
         ind.hold <- pop.get[k,]
         temp.mat[1,] <- t(t(ind.hold[c(T,F)]))
         temp.mat[2,] <-  t(t(ind.hold[c(F,T)]))
+        
         temp.mat.hold <- rbind(temp.mat.hold, temp.mat)
     
-    }
+          }
     
       mat.out.name <- paste(pop.recall[i],"matrix", sep = "_")
       assign(x = mat.out.name, value = temp.mat.hold, envir = globalenv())
@@ -144,7 +146,7 @@ for(i in 1:length(pop.recall)){
 
 
 #if(sim.pure == "Yes"){
-
+k=1
 ### MAKE PURE CROSS
 pure.name.recall <- NULL
 for(k in 1:length(pop.groups)){
@@ -191,7 +193,7 @@ for(i in 1:length(pop.recall)){
     
       inv.pure.out.name <- paste(pure.name.recall[i],"inv", sep = "_")
       assign(x = inv.pure.out.name, value = temp.mat.hold, envir = globalenv())
-      inv.pure.name.recall <- c(mat.name.recall, mat.out.name)
+      inv.pure.name.recall <- c(inv.pure.name.recall, inv.pure.out.name)
       
 }
 
@@ -201,7 +203,7 @@ for(i in 1:length(pop.recall)){
 ### MAKE F1 CROSS
 
 pop1 <- get(inv.pure.name.recall[1])
-pop2 <- get(inv.pure.name.recall[1])
+pop2 <- get(inv.pure.name.recall[2])
 F1.out <- NULL
 for(i in 1:sample.size){
 
@@ -448,7 +450,7 @@ pop.names <- c(pure.name.recall, "F1.out", "F2.out", BC.name.recall)
 
 for(i in 1:length(pop.names)){
   temp.hold <- get(pop.names[i])
-  temp.hold[,1] <- paste(pop.names[i], c(1:nrow(temp.hold)), sep = "_")
+  temp.hold[,1] <- paste0(pop.names[i], "_", c(1:nrow(temp.hold)), " ,  ")
   assign(x = pop.names[i], value = temp.hold, envir = globalenv())
   
 }
