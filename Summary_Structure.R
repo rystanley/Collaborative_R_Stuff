@@ -103,6 +103,12 @@ structureFun <- function(dir,n=2,PopOrder=NULL,South,nameManual=NULL){
   #find the Populations
   if(length(nameManual)>=1){df3$Pop <- substring(df3$ID,1,3)}else{df3$Pop <- str_extract(df3$ID, "[A-Za-z]+" )}
   
+  
+  #standardize the q values so that the north is q1 and the south is q2
+  df3a <- as.data.frame(df3%>%group_by(Pop)%>%summarise(mn=mean(Q1,na.rm=T))%>%ungroup()) #means per pop
+  
+  if(df3a[which(df3a$Pop==South)[1],"mn"]>=0.5){df3[,c("Q1","Q2")]=1-df3[,c("Q1","Q2")]} #switch if required
+  
   #set the plotting order.
   if(length(PopOrder)>1){df3$Pop <- factor(df3$Pop,levels=PopOrder)}
   
