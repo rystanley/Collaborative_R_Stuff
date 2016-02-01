@@ -26,7 +26,8 @@ p1=ggplot(nDat,aes(x=factor(Sweeps),y=value,fill=variable,group=Pop)) +
         panel.margin = unit(0.1, "lines"),
         legend.position="bottom")+
   labs(x="Population",y="",fill="")+
-scale_fill_manual(values=c("orange", "dodgerblue1", "cyan","firebrick", "coral1", "forestgreen"));p1
+scale_fill_manual(values=c("orange", "dodgerblue1", "cyan","firebrick", "coral1", "forestgreen"))+
+  guides(fill=guide_legend(nrow=1,byrow=TRUE));p1
 
 #Save plot  
 ggsave("c:/Users/Nick/Desktop/NewHybrids_Output.png",
