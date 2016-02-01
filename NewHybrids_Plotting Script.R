@@ -20,12 +20,13 @@ nDat$Pop=factor(nDat$Pop,levels=c("TKT","NWH","CBI","KJI","CLH","MBO","BRN","SYH
 p1=ggplot(nDat,aes(x=factor(Sweeps),y=value,fill=variable,group=Pop)) + 
   geom_bar(position = "stack",stat = "identity",width=1)+
   theme_bw()+scale_y_continuous(expand = c(0,0))+
-  facet_grid(~Pop,scales="free")+
+  facet_grid(~Pop,scales="free",switch="x")+
   theme(axis.text.x = element_blank(),
         axis.ticks=element_blank(),
         panel.margin = unit(0.1, "lines"),
         legend.position="bottom")+
-  labs(x="Population",y="",fill="");p1
+  labs(x="Population",y="",fill="")+
+scale_fill_manual(values=c("orange", "dodgerblue1", "cyan","firebrick", "coral1", "forestgreen"));p1
 
 #Save plot  
 ggsave("c:/Users/Nick/Desktop/NewHybrids_Output.png",
