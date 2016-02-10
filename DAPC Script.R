@@ -19,13 +19,12 @@ summary(dapc1)
 #show the assignment of each invidiual to a group
 dapc1$posterior
 
-png(filename = "DAPC_Scatterplot.png", 
-    width = 2400, height = 2400, res = 300, bg="transparent")
 #Plot your DAPC, modify as you like
-myCol <- c("darkblue","purple","green","orange","red","blue")
-scatter(dapc1, posi.da="bottomright", bg="white",
-        pch=17:22, cstar=0, col=myCol, scree.pca=TRUE,
-        posi.pca="bottomleft")
+myCol <- c("red","blue")
+
+png(filename = "DAPC_Scatterplot2.png", 
+    width = 2400, height = 2000, res = 300, bg="transparent")
+scatter(dapc1, posi.da="bottomright", bg="white",pch=17:22, cstar=0, col=myCol, scree.pca=FALSE,legend=TRUE,txt.leg=c("North","South"),solid=.4)
 dev.off()
 #OR
 #I like this one
@@ -39,3 +38,6 @@ assignplot(dapc1, subset=1:50)
 compoplot(dapc1, posi="bottomright",
          txt.leg=paste("Cluster", 1:5), lab="",
          ncol=1, xlab="individuals", col=funky(6))
+
+###Save final workspace
+save.image("C:/Users/Nick/Desktop/Postdoc/Green Crab/RAD/DAPC/All/DAPC_Full.RData")
