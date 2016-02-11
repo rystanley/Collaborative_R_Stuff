@@ -9,7 +9,7 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
 
 ## filetag - this is a name tag which will be added to the plots
 
-## Threshold - this is a theshold which will be added to the plots showing the assignment success for different levels of probability of a given 
+## threshhold - this is a theshold which will be added to the plots showing the assignment success for different levels of probability of a given 
 ##              class estimated by NH. Default is (NULL) so if nothing specified it will not add this to the output plots (success ~ threshold by class)
 
 
@@ -86,7 +86,7 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
     
     ## assign the classes to the data 
       nIndv <- nrow(sim_means)/6/length(unique(sim_means$sim)) #number of simulated individuals (assumes the same number for each class)
-      sim_means$class=rep(rep(c("Pure1","Pure2","F1","F2","BC1","BC2"),each=nIndv),times=3)
+      sim_means$class=rep(rep(c("Pure1","Pure2","F1","F2","BC1","BC2"),each=nIndv),n=3)
 
 
 #Compare the simulations using boxplots
