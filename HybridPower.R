@@ -31,7 +31,6 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
       #set directory for which holds the New Hybrids output folders
       filedir <- dir
 
-
       lfiles <- setdiff(list.files(dir),"Figures") #ignores Figures folder in case this is run more than once
      
       if(length(which(list.files(dir)=="Figures"))==0){dir.create(paste0(dir,"Figures"))} # if there isn't a 'Figures' folder for output create one
