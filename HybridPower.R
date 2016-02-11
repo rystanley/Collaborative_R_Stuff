@@ -27,7 +27,7 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
   require(stringr)
   require(reshape2)
 
-    #filedir <- "C:/Users/RyanStanley/OneDrive/PostDoc/DFO/Salmon/Frequency Based Sim/West/West Correct Wild Fst Top Loci/FileRun/"
+      filedir <- dir
 
       lfiles <- setdiff(list.files(dir),"Figures") #ignores Figures folder in case this is run more than once
      
