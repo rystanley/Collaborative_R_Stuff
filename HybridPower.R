@@ -15,7 +15,7 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
 
   
   #Check to make sure the packages required are there and if not install them
-  packages <- c("dplyr", "tidyr", "stringr","ggplot2","reshape2")
+  packages <- c("dplyr", "tidyr", "stringr","ggplot2","reshape2","grid","scales")
   if (length(setdiff(packages, rownames(installed.packages()))) > 0) { 
     install.packages(setdiff(packages, rownames(installed.packages())))
   } 
@@ -26,6 +26,8 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
   require(tidyr)
   require(stringr)
   require(reshape2)
+  require(grid)
+  require(scales)
 
 
       #set directory for which holds the New Hybrids output folders
