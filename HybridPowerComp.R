@@ -205,5 +205,118 @@ Hybridpower_comparison <-function(dir,filetag="",Thresholds=c(0.5,0.6,0.7,0.8,0.
         
     if(filetag!=""){ggsave(paste0(dir,"Figures/",filetag,"_AssignmentSuccess~z-loci.pdf"),p5,height = 10,width = 8)} else 
     {ggsave(paste0(dir,"Figures/AssignmentSuccess~~z-loci.pdf"),p5,height = 10,width = 8)}
+        
+        
+    ## Misclassification 'type II' error
+    
+      classnames <- c("Pure1","Pure2","F1","F2","BC1","BC2")
+        Start <- Sys.time()
+        missout <- NULL
+        for (s in unique(sim_means$nLoci)){
+          lsub <- filter(sim_means,nLoci == s)
+          for(i in unique(sim_means$sim)){
+            tempsub <- filter(lsub,sim==i)
+            for(q in 50:99/100){ # probability of 50 - 99%
+              tempq <- tempsub
+              tempq$missclass<- classnames[apply(tempq[,classnames],1,which.max)] # what is the class of the highest NH probability
+              
+              tempq$missval <- 999 #place holder
+              for(w in 1:nrow(tempq))
+              {
+                tempq[w,"missval"] <- tempq[w,classnames[which.max(tempq[w,classnames])]]
+              }
+              
+              temp1 <- tempq[which(tempq$class!=tempq$missclass & tempq$missval>=q),] #dataset with missclassifications
+              
+              
+              dummydf=data.frame(Var1 = c("Pure1","Pure2","F1","F2","BC1","BC2"),dummy=NA) # dataframe for dummy values
+              
+              for (z in classnames){
+                temp2 <- filter(temp1,class == z)
+                if(nrow(temp2)>0){
+                  temp3 <- as.data.frame(table(temp2$missclass)/200) # percentage of samples miss classed to a given class of a given type of class (i)
+                  
+                  temp4 <-  merge(dummydf,temp3,by="Var1",all.x = TRUE)
+                  
+                  tempout <- data.frame(nLoci=s,sim=i,level=q,class=z,
+                                        mclass_P1=temp4[which(temp4$Var1 == "Pure1"),"Freq"],
+                                        mclass_P2=temp4[which(temp4$Var1 == "Pure2"),"Freq"],
+                                        mclass_F1=temp4[which(temp4$Var1 == "F1"),"Freq"],
+                                        mclass_F2=temp4[which(temp4$Var1 == "F2"),"Freq"],
+                                        mclass_BC1=temp4[which(temp4$Var1 == "BC1"),"Freq"],
+                                        mclass_BC2=temp4[which(temp4$Var1 == "BC2"),"Freq"])
+                } else
+                {tempout <- data.frame(nLoci=s,sim=i,level=q,class=z,
+                                       mclass_P1=NA,
+                                       mclass_P2=NA,
+                                       mclass_F1=NA,
+                                       mclass_F2=NA,
+                                       mclass_BC1=NA,
+                                       mclass_BC2=NA)}
+                missout <- rbind(missout,tempout)
+                
+              } # end of  z class loop
+            } #end q loop
+          } #end i loop
+        } # end s loop
+        
+        #calcluate the means among simulations
+    miss_mean <- data.frame(missout%>%group_by(nLoci,level,class)%>%summarise(mprobP1 = mean(mclass_P1,na.rm=T), 
+                                                                   sdprobP1 = sd(mclass_P1,na.rm=T),
+                                                                   mprobP2 = mean(mclass_P2,na.rm=T), 
+                                                                   sdprobP2 = sd(mclass_P2,na.rm=T),
+                                                                   mprobF1 = mean(mclass_F1,na.rm=T), 
+                                                                   sdprobF1 = sd(mclass_F1,na.rm=T),
+                                                                   mprobF2 = mean(mclass_F2,na.rm=T), 
+                                                                   sdprobF2 = sd(mclass_F2,na.rm=T),
+                                                                   mprobBC1 = mean(mclass_BC1,na.rm=T), 
+                                                                   sdprobBC1 = sd(mclass_BC1,na.rm=T),
+                                                                   mprobBC2 = mean(mclass_BC2,na.rm=T), 
+                                                                   sdprobBC2 = sd(mclass_BC2,na.rm=T))%>%ungroup())
+    
+    miss_mean[is.na(miss_mean)]=NA #replace NaN's with NAs
+    
+    #merge with the other data
+    FinalData2 <- merge(miss_mean,FinalData,by=c("nLoci","level","class"))
+    
+    PlotData <- melt(FinalData2[c("nLoci","level","class","mprobP1","mprobP2","mprobF1","mprobF2","mprobBC1","mprobBC2")],id.vars=c("nLoci","level","class"))
+    PlotDatasd <- melt(FinalData2[c("nLoci","level","class","sdprobP1","sdprobP2","sdprobF1","sdprobF2","sdprobBC1","sdprobBC2")],id.vars=c("nLoci","level","class"))
+    PlotData$sd <- PlotDatasd$value
+    PlotData$variable <- as.character(PlotData$variable)
+    
+    PlotData[which(PlotData$variable == "mprobP1"),"variable"]="Pure1"
+    PlotData[which(PlotData$variable == "mprobP2"),"variable"]="Pure2"
+    PlotData[which(PlotData$variable == "mprobF1"),"variable"]="F1"
+    PlotData[which(PlotData$variable == "mprobF2"),"variable"]="F2"
+    PlotData[which(PlotData$variable == "mprobBC1"),"variable"]="BC1"
+    PlotData[which(PlotData$variable == "mprobBC2"),"variable"]="BC2"
+    
+    PlotData$variable=factor(PlotData$variable,levels=c("Pure1","Pure2","F1","F2","BC1","BC2"))
+      
+#     p6 <- ggplot(filter(PlotData,nLoci==192))+
+#       geom_line(aes(x=level,y=value,col=variable),lwd=1.25)+
+#       geom_line(aes(x=level,y=value+sd,col=variable),lty=2)+
+#       geom_line(aes(x=level,y=value-sd,col=variable),lty=2)+
+#       facet_wrap(~class,nrow=3,scales="free_y")+
+#       theme_bw()+scale_color_brewer(palette = "Dark2")+
+#       theme(legend.position="bottom",strip.background = element_rect(fill="white",colour = "black"))+
+#       labs(x="Probability threshold",y="Proportion misassigned ± sd",col="Classification");p6
+    
+    #Create the plots
+    
+    for (i in unique(PlotData$class)){
+        temp.plot <- ggplot(filter(PlotData,class==i))+
+        geom_line(aes(x=level,y=value,col=variable),lwd=1.25)+
+        geom_line(aes(x=level,y=value+sd,col=variable),lty=2)+
+        geom_line(aes(x=level,y=value-sd,col=variable),lty=2)+
+        facet_grid(~nLoci,scales="free_y")+
+        theme_bw()+scale_color_brewer(palette = "Dark2")+
+        theme(legend.position="bottom",strip.background = element_rect(fill="white",colour = "black"))+
+        labs(x="Probability threshold",y=paste0("Proportion ",i," misassigned ± sd"),col="Classification")
+        
+        if(filetag!=""){ggsave(paste0(dir,"Figures/",filetag,"_",i,"_MissAssignment~z-nloci.pdf"),temp.plot,height = 6,width = 8)} else 
+        {ggsave(paste0(dir,paste0("Figures/",i,"_MissAssignment~z-nloci.pdf"),temp.plot,height = 6,width = 8))}
+        
+    }
 
 } #end function
