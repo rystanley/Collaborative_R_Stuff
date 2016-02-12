@@ -330,12 +330,21 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
 
       
       #save a complete booklet of all figures as a pdf
-      pdf(file = paste0(dir,"Figures/pdf/",filetag,"_OutputBooklet.pdf"))
+      if(filetag!=""){
+        pdf(file = paste0(dir,"Figures/pdf/",filetag,"_OutputBooklet.pdf"))
         print(p2)  
         print(p1);print(h1)
         print(p3);print(h3)
         print(p4);print(h4)
-      dev.off()
+        dev.off()
+      } else {
+        pdf(file = paste0(dir,"Figures/pdf/","OutputBooklet.pdf"))
+        print(p2)  
+        print(p1);print(h1)
+        print(p3);print(h3)
+        print(p4);print(h4)
+        dev.off()
+      }
       
 
 } #end function
