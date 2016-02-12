@@ -183,7 +183,6 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL,samplesize=200) {
           ProbOutput <- rbind(ProbOutput,tempout)
           
         }
-      
     }
     
     #combined hybrid probabilities
@@ -194,7 +193,7 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL,samplesize=200) {
       for(q in 50:99/100){ # probability of 50 - 99%
         
         farm.p <- length(which(tempsub$Pure1[1:samplesize] > q))/num.sim
-        wild.p <- length(which(tempsub$Pure2[(samplesize=1):(2*samplesize)] > q))/num.sim
+        wild.p <- length(which(tempsub$Pure2[(samplesize+1):(2*samplesize)] > q))/num.sim
         Hybrid <- length(which(tempsub$phyb[((2*samplesize)+1):(6*samplesize)]>q))/(num.sim*4)
         tempout <- data.frame(sim=i,level=q,prob=c(farm.p, wild.p,Hybrid),
                               class=c("Pure1","Pure2","Hybrid")) 
@@ -238,7 +237,7 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL,samplesize=200) {
         theme_bw()+
         theme(legend.position="bottom",strip.background = element_rect(fill="white",colour = "black"))+
         scale_color_brewer(palette = "Dark2")+
-        labs(x="Probability threshold",y="Assignment success ± sd",col="Classification");h3
+        labs(x="Probability threshold",y="Assignment success ± sd",col="Classification")
       
       if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_AssinmentSuccess~level-class_Hybrid.pdf"),h3,height = 8,width = 8)} else 
       {ggsave(paste0(dir,"Figures/pdf/AssinmentSuccess~level-class_Hybrid.pdf"),h3,height = 8,width = 8)}
