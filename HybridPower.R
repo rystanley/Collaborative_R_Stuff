@@ -12,7 +12,6 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
 ## Threshold - this is a theshold which will be added to the plots showing the assignment success for different levels of probability of a given 
 ##              class estimated by NH. Default is (NULL) so if nothing specified it will not add this to the output plots (success ~ threshold by class)
 
-
   
   #Check to make sure the packages required are there and if not install them
   packages <- c("dplyr", "tidyr", "stringr","ggplot2","reshape2","grid","scales")
@@ -36,7 +35,8 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
       lfiles <- setdiff(list.files(dir),"Figures") #ignores Figures folder in case this is run more than once
      
       if(length(which(list.files(dir)=="Figures"))==0){dir.create(paste0(dir,"Figures"))} # if there isn't a 'Figures' folder for output create one
-      
+      if(length(which(list.files(paste0(dir,"Figures"))=="pdf"))==0){dir.create(paste0(dir,"Figures/pdf"))} #create a folder for pdfs
+      if(length(which(list.files(paste0(dir,"Figures"))=="jpg"))==0){dir.create(paste0(dir,"Figures/jpg"))} #create a folder for jpgs 
   
     # Collate the output from New Hybrids together ('p of z' files)
         output <- NULL
@@ -99,13 +99,38 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
     }
 
     # Create pot
-    p1=ggplot(boxdata,aes(x=sim,y=value))+geom_jitter(size=0.1)+geom_boxplot(alpha=0.8,outlier.size = 0)+theme_bw()+facet_wrap(~class,nrow=3,scales="free_y")+
+    p1 <- ggplot(boxdata,aes(x=sim,y=value))+geom_jitter(size=0.1)+geom_boxplot(alpha=0.8,outlier.size = 0)+theme_bw()+facet_wrap(~class,nrow=3,scales="free_y")+
     labs(y="Class probability",x="Simulation")+theme(strip.background = element_rect(fill="white"))
     
     #save plot
-  if(filetag!=""){ggsave(paste0(dir,"Figures/",filetag,"_AssignmentSuccess~simulation.pdf"),p1,height = 8,width = 10)}else
-  {ggsave(paste0(dir,"Figures/AssignmentSuccess~simulation.pdf"),p1,height = 8,width = 10)}
-
+    if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_AssignmentSuccess~simulation.pdf"),p1,height = 8,width = 10)}else
+    {ggsave(paste0(dir,"Figures/pdf/AssignmentSuccess~simulation.pdf"),p1,height = 8,width = 10)}
+    
+    if(filetag!=""){ggsave(paste0(dir,"Figures/jpg/",filetag,"_AssignmentSuccess~simulation.jpg"),p1,height = 8,width = 10)}else
+    {ggsave(paste0(dir,"Figures/jpg/AssignmentSuccess~simulation.jpg"),p1,height = 8,width = 10)}
+    
+    #Make similar boxplot with summed propbability of being a hybrid
+    sim_means2 <- sim_means
+    sim_means2$hybrid <- rowSums(sim_means2[,c("F1","F2","BC1","BC2")])
+    sim_means2[which(sim_means2$class =="Pure1"),"hybrid"]=sim_means2[which(sim_means2$class =="Pure1"),"Pure1"] #add values of the Pure
+    sim_means2[which(sim_means2$class =="Pure2"),"hybrid"]=sim_means2[which(sim_means2$class =="Pure2"),"Pure2"] #add values of the Pure
+    
+    sim_means2$hclass <- "Hybrid"
+    sim_means2[which(sim_means$class=="Pure1"),"hclass"] <- "Pure1"
+    sim_means2[which(sim_means$class=="Pure2"),"hclass"] <- "Pure2"
+    
+    sim_means2$hclass <- factor(sim_means2$hclass,levels=c("Pure1","Pure2","Hybrid"))
+    
+    h1 <- ggplot(sim_means2,aes(x=sim,y=hybrid))+geom_boxplot(alpha=0.8,outlier.size = 0)+theme_bw()+facet_wrap(~hclass,nrow=3)+
+      labs(y="Class probability",x="Simulation")+theme(strip.background = element_rect(fill="white"))+scale_y_continuous(limits=c(0.9,1))
+    
+    #save plot
+    if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_AssignmentSuccess~simulation_Hybrid.pdf"),h1,height = 8,width = 8)}else
+    {ggsave(paste0(dir,"Figures/pdf/AssignmentSuccess~simulation_Hybrid.pdf"),h1,height = 8,width = 10)}
+    
+    if(filetag!=""){ggsave(paste0(dir,"Figures/jpg/",filetag,"_AssignmentSuccess~simulation_Hybrid.jpg"),h1,height = 8,width = 8)}else
+    {ggsave(paste0(dir,"Figures/jpg/AssignmentSuccess~simulation_Hybrid.jpg"),h1,height = 8,width = 10)}
+  
 ## create the New Hybrids plot
   
       NH_melt <- melt(data = sim_means[,-grep("class",colnames(sim_means))], id.vars = c("Indv","sim")) ## melt the data to allow the data to be stacked by indivudal
@@ -133,8 +158,8 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
               strip.background = element_rect(fill="white",colour = "black"),panel.margin=unit(1, "lines"))
       
       #save the figure
-      if(filetag!=""){ggsave(paste0(dir,"Figures/",filetag,"_NewHybridsPlot~simulation.pdf"),p2,height = 8,width = 10)} else 
-      {ggsave(paste0(dir,"Figures/NewHybridsPlot~simulation.pdf"),p2,height = 8,width = 10)}
+      if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_NewHybridsPlot~simulation.pdf"),p2,height = 8,width = 10)} else 
+      {ggsave(paste0(dir,"Figures/pdf/NewHybridsPlot~simulation.pdf"),p2,height = 8,width = 10)}
 
 
 ## Look at assignment success as a function of threshold probability
@@ -158,6 +183,23 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
         }
       
     }
+    
+    #combined hybrid probabilities
+    ProbOutput2 <- NULL
+    for(i in unique(sim_means$sim)){
+      tempsub <- filter(sim_means,sim==i)
+      tempsub$phyb <- rowSums(tempsub[,c("F1","F2","BC1","BC2")])
+      for(q in 50:99/100){ # probability of 50 - 99%
+        
+        farm.p <- length(which(tempsub$Pure1[1:200] > q))/num.sim
+        wild.p <- length(which(tempsub$Pure2[201:400] > q))/num.sim
+        Hybrid <- length(which(tempsub$phyb[401:1200]>q))/(num.sim*4)
+        tempout <- data.frame(sim=i,level=q,prob=c(farm.p, wild.p,Hybrid),
+                              class=c("Pure1","Pure2","Hybrid")) 
+        ProbOutput2 <- rbind(ProbOutput2,tempout)
+        
+      }
+    }
 
 # get the mean and standard error for the estimates of assignment succes based on NH probabilty among simulations    
       FinalData <- data.frame(ProbOutput%>%group_by(level,class)%>%summarise(mprob = mean(prob,na.rm=T), 
@@ -168,13 +210,39 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
       FinalData$group <- "Pure"
       FinalData[which(FinalData$class %in% c("BC1","BC2")),"group"] <- "Back-cross"
       FinalData[which(FinalData$class %in% c("F1","F2")),"group"] <- "Generational hybrids"
-      
       FinalData$group <-  factor(FinalData$group,levels=c("Pure","Generational hybrids","Back-cross"))
-      FinalData$class <- factor(FinalData$class,levels=c("Pure1","Pure2","F1","F2","BC1","BC2"))
-    
-    #plot the class groupings
+      
+      #plot the class groupings
       p3 <- ggplot(FinalData,aes(x=level,y=mprob,col=class))+geom_line(lwd=1.25)+theme_bw()+facet_grid(group~.,scales="free_y")+
-        theme(legend.position="bottom",strip.background = element_rect(fill="white",colour = "black"))+labs(x="Probability threshold",y="Assignment success",col="Classification");p3
+        theme(legend.position="bottom",strip.background = element_rect(fill="white",colour = "black"))+
+        scale_color_brewer(palette = "Dark2")+
+        labs(x="Probability threshold",y="Assignment success",col="Classification")
+      
+      if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_AssinmentSuccess~level-class.pdf"),p3,height = 10,width = 8)} else 
+      {ggsave(paste0(dir,"Figures/pdf/AssinmentSuccess~level-class.pdf"),p3,height = 10,width = 8)}
+      
+      if(filetag!=""){ggsave(paste0(dir,"Figures/jpg/",filetag,"_AssinmentSuccess~level-class.jpg"),p3,height = 10,width = 8)} else 
+      {ggsave(paste0(dir,"Figures/jpg/AssinmentSuccess~level-class.jpg"),p3,height = 10,width = 8)}
+      
+      #ComboHybrids
+      FinalData2 <- data.frame(ProbOutput2%>%group_by(level,class)%>%summarise(mprob = mean(prob,na.rm=T), 
+                                                                               sdprob = sd(prob,na.rm=T))%>%ungroup())
+      FinalData2$class <- factor(FinalData2$class, levels=c("Pure1","Pure2","Hybrid")) # set plotting levels
+
+      h3 <- ggplot(FinalData2)+
+        geom_line(aes(x=level,y=mprob,col=class),lwd=1.25)+
+        geom_line(aes(x=level,y=mprob+sdprob,col=class),lty=2)+
+        geom_line(aes(x=level,y=mprob-sdprob,col=class),lty=2)+
+        theme_bw()+
+        theme(legend.position="bottom",strip.background = element_rect(fill="white",colour = "black"))+
+        scale_color_brewer(palette = "Dark2")+
+        labs(x="Probability threshold",y="Assignment success ± sd",col="Classification");h3
+      
+      if(filetag!=""){ggsave(paste0(dir,"Figures/",filetag,"_AssinmentSuccess~level-class_Hybrid.pdf"),h3,height = 8,width = 8)} else 
+      {ggsave(paste0(dir,"Figures/AssinmentSuccess~level-class_Hybrid.pdf"),h3,height = 8,width = 8)}
+      
+      if(filetag!=""){ggsave(paste0(dir,"Figures/jpg/",filetag,"_AssinmentSuccess~level-class_Hybrid.jpg"),h3,height = 8,width = 8)} else 
+      {ggsave(paste0(dir,"Figures/jpg/AssinmentSuccess~level-class_Hybrid.jpg"),h3,height = 8,width = 8)}
 
     #plot if no threshold specified
       if(length(Threshold)==0){
@@ -208,14 +276,66 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
           labs(x="Probability threshold",y="Assignment success ± sd")+
           theme(strip.background = element_rect(fill="white",colour = "black"))+
           geom_text(data=threshlimits,aes(x=0.55,y = mprob-(mprob-lim)*0.1,label=round(mprob,2)));p4
+       }
+      
+      #Save plot
+      if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_AssignmentSuccess~level-error.pdf"),p4,height = 10,width = 8)} else 
+      {ggsave(paste0(dir,"Figures/pdf/AssignmentSuccess~level-error.pdf"),p4,height = 10,width = 8)}
+      
+      if(filetag!=""){ggsave(paste0(dir,"Figures/jpg/",filetag,"_AssignmentSuccess~level-error.jpg"),p4,height = 10,width = 8)} else 
+      {ggsave(paste0(dir,"Figures/jpg/AssignmentSuccess~level-error.jpg"),p4,height = 10,width = 8)}
+      
+      ### Combo Hybrids
+      
+      #plot if no threshold specified
+      if(length(Threshold)==0){
+        h4 <- ggplot(data=FinalData2)+geom_line(aes(x=level,y=mprob),lwd=1.25)+
+          geom_line(aes(x=level,y=mprob+sdprob),lty=2)+geom_line(aes(x=level,y=mprob-sdprob),lty=2)+
+          theme_bw()+facet_wrap(~class,nrow=3,scales="free_y")+theme(strip.background = element_rect(fill="white",colour = "black"))+
+          labs(x="Probability threshold",y="Assignment success ± sd");h4
       }
+      
+      #plot if threshold specified 
+      if(length(Threshold)!=0){
+        #calcualte the lower assignment success for each class
+        lowerlim <- data.frame(FinalData2%>%group_by(class)%>%
+                                 summarise(lim=min(mprob))%>%ungroup())
+        
+        threshlimits <- filter(FinalData2,level==Threshold)
+        threshlimits$lower <- 0.5
+        threshlimits$threshold <- Threshold
+        threshlimits$x <- (threshlimits$threshold-0.5)/2
+        threshlimits <- merge(threshlimits,lowerlim,by = "class")
+        threshlimits$lim <- threshlimits$lim-threshlimits$sdprob
+        
+        h4 <- ggplot(data=FinalData2)+
+          geom_line(aes(x=level,y=mprob),lwd=1.25)+
+          geom_line(aes(x=level,y=mprob+sdprob),lty=2)+
+          geom_line(aes(x=level,y=mprob-sdprob),lty=2)+
+          theme_bw()+facet_wrap(~class,nrow=3,scales="free_y")+
+          geom_segment(data=threshlimits,aes(x=lower,xend=level,y=mprob,yend=mprob),col="black")+
+          geom_segment(data=threshlimits,aes(x=level,xend=level,y=lim,yend=mprob),col="black")+
+          scale_y_continuous(expand=c(0.03,0))+scale_x_continuous(expand=c(0,0))+
+          labs(x="Probability threshold",y="Assignment success ± sd")+
+          theme(strip.background = element_rect(fill="white",colour = "black"))+
+          geom_text(data=threshlimits,aes(x=0.55,y = mprob-(mprob-lim)*0.1,label=round(mprob,3)));h4
+      }
+      
+      #Save plot
+      if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_AssignmentSuccess~level-error_Hybrid.pdf"),h4,height = 10,width = 8)} else 
+      {ggsave(paste0(dir,"Figures/pdf/AssignmentSuccess~level-error_Hybrid.pdf"),h4,height = 10,width = 8)}
+      
+      if(filetag!=""){ggsave(paste0(dir,"Figures/jpg/",filetag,"_AssignmentSuccess~level-error_Hybrid.jpg"),h4,height = 10,width = 8)} else 
+      {ggsave(paste0(dir,"Figures/jpg/AssignmentSuccess~level-error_Hybrid.jgp"),h4,height = 10,width = 8)}
 
-#Save plots
-
-    if(filetag!=""){ggsave(paste0(dir,"Figures/",filetag,"_AssinmentSuccess~level-class.pdf"),p3,height = 10,width = 8)} else 
-    {ggsave(paste0(dir,"Figures/AssinmentSuccess~level-class.pdf"),p3,height = 10,width = 8)}
-    
-    if(filetag!=""){ggsave(paste0(dir,"Figures/",filetag,"_AssignmentSuccess~level-error.pdf"),p4,height = 10,width = 8)} else 
-    {ggsave(paste0(dir,"Figures/AssignmentSuccess~level-error.pdf"),p4,height = 10,width = 8)}
+      
+      #save a complete booklet of all figures as a pdf
+      pdf(file = paste0(dir,"Figures/pdf/",filetag,"_OutputBooklet.pdf"))
+        print(p2)  
+        print(p1);print(h1)
+        print(p3);print(h3)
+        print(p4);print(h4)
+      dev.off()
+      
 
 } #end function
