@@ -2,6 +2,8 @@ calc.prop.correctFN <- function(NHResults, print.results = TRUE, all.hyb = FALSE
 
 num.sim <- nrow(NHResults)/(length(NHResults)-1)
 
+NHResults$pHyb <- rowSums(NHResults[4:7])
+
 ## there is the potential for NH to assign different groups to Pop1 and Pop2 between runs since functionally there is no differrence
   ## which population it designates one and 2 
       ## the only issue is that to calculate the mean proportion that have been assigned correctly, need to have the individuals given
