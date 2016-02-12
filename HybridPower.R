@@ -238,8 +238,8 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
         scale_color_brewer(palette = "Dark2")+
         labs(x="Probability threshold",y="Assignment success ± sd",col="Classification");h3
       
-      if(filetag!=""){ggsave(paste0(dir,"Figures/",filetag,"_AssinmentSuccess~level-class_Hybrid.pdf"),h3,height = 8,width = 8)} else 
-      {ggsave(paste0(dir,"Figures/AssinmentSuccess~level-class_Hybrid.pdf"),h3,height = 8,width = 8)}
+      if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_AssinmentSuccess~level-class_Hybrid.pdf"),h3,height = 8,width = 8)} else 
+      {ggsave(paste0(dir,"Figures/pdf/AssinmentSuccess~level-class_Hybrid.pdf"),h3,height = 8,width = 8)}
       
       if(filetag!=""){ggsave(paste0(dir,"Figures/jpg/",filetag,"_AssinmentSuccess~level-class_Hybrid.jpg"),h3,height = 8,width = 8)} else 
       {ggsave(paste0(dir,"Figures/jpg/AssinmentSuccess~level-class_Hybrid.jpg"),h3,height = 8,width = 8)}
