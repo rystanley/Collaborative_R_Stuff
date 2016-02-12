@@ -1,4 +1,4 @@
-Hybridpower <-function(dir,filetag="",Threshold=NULL) {
+Hybridpower <-function(dir,filetag="",Threshold=NULL,samplesize=200) {
   
 ## this function will estimate the power of assignment success and associated variability from New Hybrids for 6 possible classes
 #  Pure1, Pure2, F1, F2, BC1, BC2. The code is based on different simulations of individuals and repeat runs through New Hybrids (NH)
@@ -12,6 +12,8 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
 ## Threshold - this is a theshold which will be added to the plots showing the assignment success for different levels of probability of a given 
 ##              class estimated by NH. Default is (NULL) so if nothing specified it will not add this to the output plots (success ~ threshold by class)
 
+## samplesize - is the number of fish per NH class (default = 200). The assumption is there is equal numbers for each class. If not there must be a 0 or NA added hold the data structure
+  
   
   #Check to make sure the packages required are there and if not install them
   packages <- c("dplyr", "tidyr", "stringr","ggplot2","reshape2","grid","scales")
@@ -57,7 +59,7 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
                 tempfile=tempfile[,c("Indv","sim","rep","Pure1","Pure2","F1","F2","BC1","BC2")]# reorder
                 
               #common order
-                if(sum(tempfile[1:200,"Pure1"],na.rm=T)<sum(tempfile[1:200,"Pure2"],na.rm=T)){
+                if(sum(tempfile[1:samplesize,"Pure1"],na.rm=T)<sum(tempfile[1:samplesize,"Pure2"],na.rm=T)){
                   pure1 <- tempfile$Pure2;pure2 <- tempfile$Pure1
                   bc1 <- tempfile$BC2;bc2 <- tempfile$BC1
                   
@@ -170,12 +172,12 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
       tempsub <- filter(sim_means,sim==i)
         for(q in 50:99/100){ # probability of 50 - 99%
          
-          farm.p <- length(which(tempsub$Pure1[1:200] > q))/num.sim
-          wild.p <- length(which(tempsub$Pure2[201:400] > q))/num.sim
-          F1.p <- length(which(tempsub$F1[401:600] > q))/num.sim
-          F2.p <- length(which(tempsub$F2[601:800] > q))/num.sim
-          farmBC.p <- length(which(tempsub$BC1[801:1000] > q))/num.sim
-          wildBC.p <- length(which(tempsub$BC2[1001:1200] > q))/num.sim
+          farm.p <- length(which(tempsub$Pure1[1:samplesize] > q))/num.sim
+          wild.p <- length(which(tempsub$Pure2[(samplesize+1):(2*samplesize)] > q))/num.sim
+          F1.p <- length(which(tempsub$F1[((2*samplesize)+1):(3*samplesize)] > q))/num.sim
+          F2.p <- length(which(tempsub$F2[((3*samplesize)+1):(4*samplesize)] > q))/num.sim
+          farmBC.p <- length(which(tempsub$BC1[((4*samplesize)+1):(5*samplesize)] > q))/num.sim
+          wildBC.p <- length(which(tempsub$BC2[((5*samplesize)+1):(6*samplesize)] > q))/num.sim
           tempout <- data.frame(sim=i,level=q,prob=c(farm.p, wild.p,F1.p,F2.p,farmBC.p,wildBC.p),
                                 class=c("Pure1","Pure2","F1","F2","BC1","BC2")) 
           ProbOutput <- rbind(ProbOutput,tempout)
@@ -191,9 +193,9 @@ Hybridpower <-function(dir,filetag="",Threshold=NULL) {
       tempsub$phyb <- rowSums(tempsub[,c("F1","F2","BC1","BC2")])
       for(q in 50:99/100){ # probability of 50 - 99%
         
-        farm.p <- length(which(tempsub$Pure1[1:200] > q))/num.sim
-        wild.p <- length(which(tempsub$Pure2[201:400] > q))/num.sim
-        Hybrid <- length(which(tempsub$phyb[401:1200]>q))/(num.sim*4)
+        farm.p <- length(which(tempsub$Pure1[1:samplesize] > q))/num.sim
+        wild.p <- length(which(tempsub$Pure2[(samplesize=1):(2*samplesize)] > q))/num.sim
+        Hybrid <- length(which(tempsub$phyb[((2*samplesize)+1):(6*samplesize)]>q))/(num.sim*4)
         tempout <- data.frame(sim=i,level=q,prob=c(farm.p, wild.p,Hybrid),
                               class=c("Pure1","Pure2","Hybrid")) 
         ProbOutput2 <- rbind(ProbOutput2,tempout)
