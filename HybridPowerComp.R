@@ -1,4 +1,4 @@
-Hybridpower_comparison <-function(dir,filetag="",Thresholds=c(0.5,0.6,0.7,0.8,0.9),addThresh=FALSE){
+Hybridpower_comparison <-function(dir,filetag="",Thresholds=c(0.5,0.6,0.7,0.8,0.9),addThresh=FALSE,samplesize=200){
   
 ## this function will estimate the power of assignment success and associated variability from New Hybrids for 6 possible classes
 #  Pure1, Pure2, F1, F2, BC1, BC2. The code is based on different simulations of individuals and repeat runs through New Hybrids (NH)
@@ -11,7 +11,9 @@ Hybridpower_comparison <-function(dir,filetag="",Thresholds=c(0.5,0.6,0.7,0.8,0.
 
 ## Thresholds - this is a vector of thesholds (default c(0.6,0.7,0.8,0.9)) which will to compare among different thesholds to compare among different numbers of SNPs
 
-## addThresh - a logical vector (default: FALSE) which specifies whether the threshold values should be added to the summary plot.               
+## addThresh - a logical vector (default: FALSE) which specifies whether the threshold values should be added to the summary plot.     
+  
+## samplesize - is the number of fish per NH class (default = 200). The assumption is there is equal numbers for each class. If not there must be a 0 or NA added hold the data structure
 
 
   #Check to make sure the packages required are there and if not install them
@@ -36,6 +38,8 @@ Hybridpower_comparison <-function(dir,filetag="",Thresholds=c(0.5,0.6,0.7,0.8,0.
       lfiles <- setdiff(list.files(dir),"Figures") #ignores Figures folder in case this is run more than once
      
       if(length(which(list.files(dir)=="Figures"))==0){dir.create(paste0(dir,"Figures"))} # if there isn't a 'Figures' folder for output create one
+      if(length(which(list.files(paste0(dir,"Figures"))=="pdf"))==0){dir.create(paste0(dir,"Figures/pdf"))} #create a folder for pdfs
+      if(length(which(list.files(paste0(dir,"Figures"))=="jpg"))==0){dir.create(paste0(dir,"Figures/jpg"))} #create a folder for jpgs 
       
   
     # Collate the output from New Hybrids together ('p of z' files)
@@ -65,7 +69,7 @@ Hybridpower_comparison <-function(dir,filetag="",Thresholds=c(0.5,0.6,0.7,0.8,0.
                 tempfile=tempfile[,c("Indv","sim","rep","nLoci","Pure1","Pure2","F1","F2","BC1","BC2")]# reorder
                 
               #common order
-                if(sum(tempfile[1:200,"Pure1"],na.rm=T)<sum(tempfile[1:200,"Pure2"],na.rm=T)){
+                if(sum(tempfile[1:samplesize,"Pure1"],na.rm=T)<sum(tempfile[1:samplesize,"Pure2"],na.rm=T)){
                   pure1 <- tempfile$Pure2;pure2 <- tempfile$Pure1
                   bc1 <- tempfile$BC2;bc2 <- tempfile$BC1
                   
@@ -74,7 +78,7 @@ Hybridpower_comparison <-function(dir,filetag="",Thresholds=c(0.5,0.6,0.7,0.8,0.
                 }
               
               #flag bad runs
-              if(sum(tempfile$F2)>sum(sum(tempfile$Pure1),sum(tempfile$Pure2))){tempfile[,4:length(tempfile)]=NA}
+              if(sum(tempfile$F2)>sum(sum(tempfile$Pure1),sum(tempfile$Pure2))){tempfile[,5:length(tempfile)]=NA}
               
               output <- rbind(output,tempfile)
           
@@ -113,12 +117,39 @@ Hybridpower_comparison <-function(dir,filetag="",Thresholds=c(0.5,0.6,0.7,0.8,0.
 
     # Create pot
     p1=ggplot(boxdata,aes(x=nLoci,y=value,fill=sim))+geom_boxplot(alpha=0.8,outlier.size = 0)+theme_bw()+facet_wrap(~class,nrow=3,scales="free_y")+
-      labs(y="Class probability",x="Number of SNPs")+scale_fill_manual(values=c("white","white","white"))+
+      labs(y="Class probability",x="Number of loci")+scale_fill_manual(values=c("white","white","white"))+
       theme(strip.background = element_rect(fill="white"),legend.position="none")
    
     #save plot
-  if(filetag!=""){ggsave(paste0(dir,"Figures/",filetag,"_AssignmentSuccess~simulation-nSNPs.pdf"),p1,height = 8,width = 10)}else
-  {ggsave(paste0(dir,"Figures/AssignmentSuccess~simulation-nSNPs.pdf"),p1,height = 8,width = 10)}
+    if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_AssignmentSuccess~simulation-nSNPs.pdf"),p1,height = 8,width = 10)}else
+    {ggsave(paste0(dir,"Figures/pdf/AssignmentSuccess~simulation-nSNPs.pdf"),p1,height = 8,width = 10)}
+    
+    if(filetag!=""){ggsave(paste0(dir,"Figures/jpg/",filetag,"_AssignmentSuccess~simulation-nSNPs.jpg"),p1,height = 8,width = 10)}else
+    {ggsave(paste0(dir,"Figures/jpg/AssignmentSuccess~simulation-nSNPs.jpg"),p1,height = 8,width = 10)}
+    
+    #Combined loci
+    sim_means2 <- sim_means
+    sim_means2$hybrid <- rowSums(sim_means2[,c("F1","F2","BC1","BC2")])
+    sim_means2[which(sim_means2$class =="Pure1"),"hybrid"]=sim_means2[which(sim_means2$class =="Pure1"),"Pure1"] #add values of the Pure
+    sim_means2[which(sim_means2$class =="Pure2"),"hybrid"]=sim_means2[which(sim_means2$class =="Pure2"),"Pure2"] #add values of the Pure
+    
+    sim_means2$hclass <- "Hybrid"
+    sim_means2[which(sim_means$class=="Pure1"),"hclass"] <- "Pure1"
+    sim_means2[which(sim_means$class=="Pure2"),"hclass"] <- "Pure2"
+    
+    sim_means2$hclass <- factor(sim_means2$hclass,levels=c("Pure1","Pure2","Hybrid"))
+    
+    h1 <- ggplot(sim_means2,aes(x=factor(nLoci),y=hybrid,fill=sim))+geom_boxplot(alpha=0.8,outlier.size = 0)+theme_bw()+facet_wrap(~hclass,nrow=3,scales="free_y")+
+      labs(y="Class probability",x="Number of loci")+scale_fill_manual(values=c("white","white","white"))+
+      theme(strip.background = element_rect(fill="white"),legend.position="none")+scale_y_continuous(limits=c(0.6,1))
+   
+    #Save plot
+    if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_AssignmentSuccess~simulation-nSNPs_Hybrid.pdf"),h1,height = 8,width = 8)}else
+    {ggsave(paste0(dir,"Figures/pdf/AssignmentSuccess~simulation-nSNPs_Hybrid.pdf"),h1,height = 8,width = 8)}
+    
+    if(filetag!=""){ggsave(paste0(dir,"Figures/jpg/",filetag,"_AssignmentSuccess~simulation-nSNPs_Hybrid.jpg"),h1,height = 8,width = 8)}else
+    {ggsave(paste0(dir,"Figures/jpg/AssignmentSuccess~simulation-nSNPs_Hybrid.jpg"),h1,height = 8,width = 8)}
+    
 
 ## Look at assignment success as a function of threshold probability
     num.sim <- length(which(sim_means$sim=="S1"))/6/length(unique(sim_means$nLoci))
@@ -130,19 +161,38 @@ Hybridpower_comparison <-function(dir,filetag="",Thresholds=c(0.5,0.6,0.7,0.8,0.
           tempsub <- filter(lsub,sim==i)
             for(q in 50:99/100){ # probability of 50 - 99%
              
-              farm.p <- length(which(tempsub$Pure1[1:200] > q))/num.sim
-              wild.p <- length(which(tempsub$Pure2[201:400] > q))/num.sim
-              F1.p <- length(which(tempsub$F1[401:600] > q))/num.sim
-              F2.p <- length(which(tempsub$F2[601:800] > q))/num.sim
-              farmBC.p <- length(which(tempsub$BC1[801:1000] > q))/num.sim
-              wildBC.p <- length(which(tempsub$BC2[1001:1200] > q))/num.sim
+              farm.p <- length(which(tempsub$Pure1[1:samplesize] > q))/num.sim
+              wild.p <- length(which(tempsub$Pure2[(samplesize+1):(2*samplesize)] > q))/num.sim
+              F1.p <- length(which(tempsub$F1[((2*samplesize)+1):(3*samplesize)] > q))/num.sim
+              F2.p <- length(which(tempsub$F2[((3*samplesize)+1):(4*samplesize)] > q))/num.sim
+              farmBC.p <- length(which(tempsub$BC1[((4*samplesize)+1):(5*samplesize)] > q))/num.sim
+              wildBC.p <- length(which(tempsub$BC2[((5*samplesize)+1):(6*samplesize)] > q))/num.sim
               tempout <- data.frame(nLoci=s,sim=i,level=q,prob=c(farm.p, wild.p,F1.p,F2.p,farmBC.p,wildBC.p),
                                     class=c("Pure1","Pure2","F1","F2","BC1","BC2")) 
               ProbOutput <- rbind(ProbOutput,tempout)
               
-            } #end q loop
-          } #end i loop
+            } # end q loop
+          } # end i loop
         } # end s loop
+    
+    #combined hybrid probabilities
+    ProbOutput2 <- NULL
+    for (s in unique(sim_means$nLoci)){
+      lsub <- filter(sim_means,nLoci == s)
+      for(i in unique(sim_means$sim)){
+        tempsub <- filter(lsub,sim==i)
+        tempsub$phyb <- rowSums(tempsub[,c("F1","F2","BC1","BC2")])
+        
+        for(q in 50:99/100){ # probability of 50 - 99%
+          farm.p <- length(which(tempsub$Pure1[1:samplesize] > q))/num.sim
+          wild.p <- length(which(tempsub$Pure2[(samplesize+1):(2*samplesize)] > q))/num.sim
+          Hybrid <- length(which(tempsub$phyb[((2*samplesize)+1):(6*samplesize)]>q))/(num.sim*4)
+          tempout <- data.frame(nLoci=s,sim=i,level=q,prob=c(farm.p, wild.p,Hybrid),
+                                class=c("Pure1","Pure2","Hybrid")) 
+          ProbOutput2 <- rbind(ProbOutput2,tempout)
+        } # end q loop
+      } # end i loop
+    } # end s loop
 
 # get the mean and standard error for the estimates of assignment succes based on NH probabilty among simulations    
       FinalData <- data.frame(ProbOutput%>%group_by(nLoci,level,class)%>%summarise(mprob = mean(prob,na.rm=T), 
@@ -162,6 +212,34 @@ Hybridpower_comparison <-function(dir,filetag="",Thresholds=c(0.5,0.6,0.7,0.8,0.
         theme(legend.position="bottom",strip.background = element_rect(fill="white",colour = "black"))+
         scale_color_brewer(palette = "Dark2")+
         labs(x="Probability threshold",y="Assignment success",col="Classification")
+      
+      #Save plot
+      if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_AssinmentSuccess~level-class.pdf"),p3,height = 10,width = 8)} else 
+      {ggsave(paste0(dir,"Figures/pdf/AssinmentSuccess~level-class.pdf"),p3,height = 10,width = 8)}
+      
+      if(filetag!=""){ggsave(paste0(dir,"Figures/jpg/",filetag,"_AssinmentSuccess~level-class.jpg"),p3,height = 10,width = 8)} else 
+      {ggsave(paste0(dir,"Figures/jpg/AssinmentSuccess~level-class.jpg"),p3,height = 10,width = 8)}
+      
+      #ComboHybrids
+      FinalData2 <- data.frame(ProbOutput2%>%group_by(nLoci,level,class)%>%summarise(mprob = mean(prob,na.rm=T), 
+                                                                               sdprob = sd(prob,na.rm=T))%>%ungroup())
+      FinalData2$class <- factor(FinalData2$class, levels=c("Pure1","Pure2","Hybrid")) # set plotting levels
+      
+      h3 <- ggplot(FinalData2)+
+        geom_line(aes(x=level,y=mprob,col=class),lwd=1.25)+
+        geom_line(aes(x=level,y=mprob+sdprob,col=class),lty=2)+
+        geom_line(aes(x=level,y=mprob-sdprob,col=class),lty=2)+
+        theme_bw()+
+        facet_grid(~nLoci)+
+        theme(legend.position="bottom",strip.background = element_rect(fill="white",colour = "black"))+
+        scale_color_brewer(palette = "Dark2")+
+        labs(x="Probability threshold",y="Assignment success ± sd",col="Classification");h3
+      
+      if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_AssinmentSuccess~level-class_Hybrid.pdf"),h3,height = 8,width = 10)} else 
+      {ggsave(paste0(dir,"Figures/pdf/AssinmentSuccess~level-class_Hybrid.pdf"),h3,height = 8,width = 10)}
+      
+      if(filetag!=""){ggsave(paste0(dir,"Figures/jpg/",filetag,"_AssinmentSuccess~level-class_Hybrid.jpg"),h3,height = 8,width = 10)} else 
+      {ggsave(paste0(dir,"Figures/jpg/AssinmentSuccess~level-class_Hybrid.jpg"),h3,height = 8,width = 10)}
 
     #plot if no threshold specified
       if(addThresh){
@@ -182,6 +260,39 @@ Hybridpower_comparison <-function(dir,filetag="",Thresholds=c(0.5,0.6,0.7,0.8,0.
           labs(x="Probability threshold",y="Assignment success ± sd",col="# Loci")
       }
       
+      if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_AssignmentSuccess~level-error.pdf"),p4,height = 10,width = 8)} else 
+      {ggsave(paste0(dir,"Figures/pdf/AssignmentSuccess~level-error.pdf"),p4,height = 10,width = 8)}
+      
+      if(filetag!=""){ggsave(paste0(dir,"Figures/jpg/",filetag,"_AssignmentSuccess~level-error.jpg"),p4,height = 10,width = 8)} else 
+      {ggsave(paste0(dir,"Figures/jpg/AssignmentSuccess~level-error.jpg"),p4,height = 10,width = 8)}
+      
+      ## combined hybrids
+      
+      if(addThresh){
+        h4 <- ggplot(data=FinalData2)+geom_line(aes(x=level,y=mprob,col=factor(nLoci)),lwd=1.25)+
+          geom_line(aes(x=level,y=mprob+sdprob,col=factor(nLoci)),lty=2)+
+          geom_line(aes(x=level,y=mprob-sdprob,col=factor(nLoci)),lty=2)+
+          theme_bw()+facet_grid(~class)+theme(strip.background = element_rect(fill="white",colour = "black"))+
+          scale_color_brewer(palette = "Dark2")+
+          labs(x="Probability threshold",y="Assignment success ± sd",col="# Loci")+geom_vline(xintercept = Thresholds, lty=2)
+      }
+      
+      if(!addThresh){
+        h4 <- ggplot(data=FinalData2)+geom_line(aes(x=level,y=mprob,col=factor(nLoci)),lwd=1.25)+
+          geom_line(aes(x=level,y=mprob+sdprob,col=factor(nLoci)),lty=2)+
+          geom_line(aes(x=level,y=mprob-sdprob,col=factor(nLoci)),lty=2)+
+          theme_bw()+facet_grid(~class)+theme(strip.background = element_rect(fill="white",colour = "black"))+
+          scale_color_brewer(palette = "Dark2")+
+          labs(x="Probability threshold",y="Assignment success ± sd",col="# Loci")
+      }
+      
+      #Save plot
+      if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_AssignmentSuccess~level-error_Hybrid.pdf"),h4,height = 10,width = 8)} else 
+      {ggsave(paste0(dir,"Figures/pdf/AssignmentSuccess~level-error_Hybrid.pdf"),h4,height = 10,width = 8)}
+      
+      if(filetag!=""){ggsave(paste0(dir,"Figures/jpg/",filetag,"_AssignmentSuccess~level-error_Hybrid.jpg"),h4,height = 10,width = 8)} else 
+      {ggsave(paste0(dir,"Figures/jpg/AssignmentSuccess~level-error_Hybrid.jpg"),h4,height = 10,width = 8)}
+      
       ## mean plot
       
       #facet labels
@@ -193,18 +304,31 @@ Hybridpower_comparison <-function(dir,filetag="",Thresholds=c(0.5,0.6,0.7,0.8,0.
         facet_grid(~threshold)+theme_bw()+
         labs(x="Number of loci",y="Assignment success ± sd",col="Classification",group="")+scale_color_brewer(palette = "Dark2")+
         theme(legend.position="bottom",strip.background = element_rect(fill="white",colour = "black"))
-      
-      
-#Save plots
-
-    if(filetag!=""){ggsave(paste0(dir,"Figures/",filetag,"_AssinmentSuccess~level-class.pdf"),p3,height = 10,width = 8)} else 
-    {ggsave(paste0(dir,"Figures/AssinmentSuccess~level-class.pdf"),p3,height = 10,width = 8)}
-    
-    if(filetag!=""){ggsave(paste0(dir,"Figures/",filetag,"_AssignmentSuccess~level-error.pdf"),p4,height = 10,width = 8)} else 
-    {ggsave(paste0(dir,"Figures/AssignmentSuccess~level-error.pdf"),p4,height = 10,width = 8)}
         
-    if(filetag!=""){ggsave(paste0(dir,"Figures/",filetag,"_AssignmentSuccess~z-loci.pdf"),p5,height = 10,width = 8)} else 
-    {ggsave(paste0(dir,"Figures/AssignmentSuccess~~z-loci.pdf"),p5,height = 10,width = 8)}
+        #Save plot
+        if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_AssignmentSuccess~z-loci.pdf"),p5,height = 8,width = 10)} else 
+        {ggsave(paste0(dir,"Figures/pdf/AssignmentSuccess~~z-loci.pdf"),p5,height = 8,width = 10)}
+        
+        if(filetag!=""){ggsave(paste0(dir,"Figures/jpg/",filetag,"_AssignmentSuccess~z-loci.jpg"),p5,height = 8,width = 10)} else 
+        {ggsave(paste0(dir,"Figures/jpg/AssignmentSuccess~~z-loci.jpg"),p5,height = 8,width = 10)}
+        
+        #Combined Hybrids
+        FinalData2$threshold <- paste0(FinalData2$level*100,"%")
+        
+        h5 <- ggplot(filter(FinalData2,level %in% Thresholds),aes(x=factor(nLoci),y=mprob,col=class,group=class))+
+          geom_point(size=2.5)+geom_path(lwd=0.9)+
+          geom_errorbar(aes(ymin=mprob-sdprob,ymax=mprob+sdprob),width=0.1)+
+          facet_grid(~threshold)+theme_bw()+
+          labs(x="Number of loci",y="Assignment success ± sd",col="Classification",group="")+scale_color_brewer(palette = "Dark2")+
+          theme(legend.position="bottom",strip.background = element_rect(fill="white",colour = "black"))
+      
+        #Save plot
+        if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_AssignmentSuccess~z-loci_Hybrid.pdf"),h5,height = 8,width = 10)} else 
+        {ggsave(paste0(dir,"Figures/pdf/AssignmentSuccess~~z-loci_Hybrid.pdf"),h5,height = 9,width = 10)}
+        
+        if(filetag!=""){ggsave(paste0(dir,"Figures/jpg/",filetag,"_AssignmentSuccess~z-loci_Hybrid.jpg"),h5,height = 8,width = 10)} else 
+        {ggsave(paste0(dir,"Figures/jpg/AssignmentSuccess~~z-loci_Hybrid.jpg"),h5,height = 8,width = 10)}
+
         
         
     ## Misclassification 'type II' error
@@ -234,7 +358,7 @@ Hybridpower_comparison <-function(dir,filetag="",Thresholds=c(0.5,0.6,0.7,0.8,0.
               for (z in classnames){
                 temp2 <- filter(temp1,class == z)
                 if(nrow(temp2)>0){
-                  temp3 <- as.data.frame(table(temp2$missclass)/200) # percentage of samples miss classed to a given class of a given type of class (i)
+                  temp3 <- as.data.frame(table(temp2$missclass)/samplesize) # percentage of samples miss classed to a given class of a given type of class (i)
                   
                   temp4 <-  merge(dummydf,temp3,by="Var1",all.x = TRUE)
                   
@@ -255,8 +379,8 @@ Hybridpower_comparison <-function(dir,filetag="",Thresholds=c(0.5,0.6,0.7,0.8,0.
                                        mclass_BC2=NA)}
                 missout <- rbind(missout,tempout)
                 
-              } # end of  z class loop
-            } #end q loop
+              } # end of z class loop
+            } # end q loop
           } #end i loop
         } # end s loop
         
@@ -314,9 +438,52 @@ Hybridpower_comparison <-function(dir,filetag="",Thresholds=c(0.5,0.6,0.7,0.8,0.
         theme(legend.position="bottom",strip.background = element_rect(fill="white",colour = "black"))+
         labs(x="Probability threshold",y=paste0("Proportion ",i," misassigned ± sd"),col="Classification")
         
-        if(filetag!=""){ggsave(paste0(dir,"Figures/",filetag,"_",i,"_MissAssignment~z-nloci.pdf"),temp.plot,height = 6,width = 8)} else 
-        {ggsave(paste0(dir,paste0("Figures/",i,"_MissAssignment~z-nloci.pdf"),temp.plot,height = 6,width = 8))}
+        if(filetag!=""){ggsave(paste0(dir,"Figures/pdf/",filetag,"_",i,"_MissAssignment~z-nloci.pdf"),temp.plot,height = 6,width = 8)} else 
+        {ggsave(paste0(dir,paste0("Figures/pdf/",i,"_MissAssignment~z-nloci.pdf"),temp.plot,height = 6,width = 8))}
         
+        if(filetag!=""){ggsave(paste0(dir,"Figures/jpg/",filetag,"_",i,"_MissAssignment~z-nloci.jpg"),temp.plot,height = 6,width = 8)} else 
+        {ggsave(paste0(dir,paste0("Figures/jpg/",i,"_MissAssignment~z-nloci.jpg"),temp.plot,height = 6,width = 8))}
+        
+    }
+    
+    ## Create summary booklet
+    
+    if(filetag!=""){
+      pdf(file = paste0(dir,"Figures/pdf/",filetag,"_OutputBooklet.pdf"))
+      print(p1);print(h1)
+      print(p3);print(h3)
+      print(p4);print(h4)
+      print(p5);print(h5)
+      for (i in unique(PlotData$class)){
+        temp.plot <- ggplot(filter(PlotData,class==i))+
+          geom_line(aes(x=level,y=value,col=variable),lwd=1.25)+
+          geom_line(aes(x=level,y=value+sd,col=variable),lty=2)+
+          geom_line(aes(x=level,y=value-sd,col=variable),lty=2)+
+          facet_grid(~nLoci,scales="free_y")+
+          theme_bw()+scale_color_brewer(palette = "Dark2")+
+          theme(legend.position="bottom",strip.background = element_rect(fill="white",colour = "black"))+
+          labs(x="Probability threshold",y=paste0("Proportion ",i," misassigned ± sd"),col="Classification")
+          print(temp.plot)
+          }
+      dev.off()
+    } else {
+      pdf(file = paste0(dir,"Figures/pdf/",filetag,"_OutputBooklet.pdf"))
+      print(p1);print(h1)
+      print(p3);print(h3)
+      print(p4);print(h4)
+      print(p5);print(h5)
+      for (i in unique(PlotData$class)){
+        temp.plot <- ggplot(filter(PlotData,class==i))+
+          geom_line(aes(x=level,y=value,col=variable),lwd=1.25)+
+          geom_line(aes(x=level,y=value+sd,col=variable),lty=2)+
+          geom_line(aes(x=level,y=value-sd,col=variable),lty=2)+
+          facet_grid(~nLoci,scales="free_y")+
+          theme_bw()+scale_color_brewer(palette = "Dark2")+
+          theme(legend.position="bottom",strip.background = element_rect(fill="white",colour = "black"))+
+          labs(x="Probability threshold",y=paste0("Proportion ",i," misassigned ± sd"),col="Classification")
+        print(temp.plot)
+      }
+      dev.off()
     }
 
 } #end function

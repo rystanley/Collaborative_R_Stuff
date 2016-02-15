@@ -13,8 +13,9 @@ SourceGitFunc <- function(url)
 SourceGitFunc("https://raw.githubusercontent.com/rystanley/Collaborative_R_Stuff/master/HybridPower.R")
 
 Hybridpower(dir="C:/Users/RyanStanley/OneDrive/PostDoc/DFO/Salmon/Frequency Based Sim/West/West Correct Wild Fst Top Loci/FileRun/",
-            filetag="Top192",Threshold=0.7)
+            filetag="Top192WestNL",Threshold=0.75)
 
+<<<<<<< HEAD
 require(scales)
 require(grid)
 Hybridpower(dir = "/Users/brendanwringe/Desktop/DFO Aquaculture Interaction/Test/", filetag = "Top192", Threshold = 0.7)
@@ -248,3 +249,8 @@ filedir <- dir
 
 }
 
+=======
+#directory where the New Hybrids runs are compared among different subsets of Loci (i.e. 48, 96, 144, 192 and 240)
+Hybridpower_comparison(dir="C:/Users/RyanStanley/OneDrive/PostDoc/DFO/Salmon/Frequency Based Sim/West/West Correct Wild Fst Top Loci/FileRun/",
+                       filetag="WestNL")
+>>>>>>> origin/master
