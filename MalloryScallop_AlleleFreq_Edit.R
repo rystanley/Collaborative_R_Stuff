@@ -111,6 +111,12 @@ PopOrder <- rev(c("bon","ltb","mgd","nts","psb","bof","ssm","gmi","ssb","gmo","g
     ggsave("Scallop_Outlier_AlleleFreqHeatMap.png",Scallop_Heat_Outlier,
            width=12,height=8)
 
+    setEPS()
+    postscript("OutlierClineHeatMapTemp.eps", height=8, width=11)
+    Scallop_Heat_Outlier
+    dev.off()
+    
+    
 ## Create the allele frequency plot
 Scallop_Heat_Neutral=AlleleFreqHeatMap(GenePopData,subs = Neutral,keep = TRUE,POP="CHAR",refPop="bon",
                                        OrderPops=PopOrder,optimizer = TRUE,standardize = TRUE,plot=FALSE)
